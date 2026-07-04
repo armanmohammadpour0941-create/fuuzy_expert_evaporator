@@ -47,17 +47,18 @@ def calculate_vapor_flow(sol, u, T_sin, d):
     W_s , W_f = u
     T_f, x_f, W_bin, x_bin, T_bin = d
     t_effect_vec = sol.y[2]
-    Cp = 4.2
+    T_boiling = 50
     W_v_vec = []
    
     for i in range(len(t_effect_vec)):
         T_effect = t_effect_vec[i]
         T_t = (T_sin + T_effect) / 2
         lambda_t = latent_heat(T_t)
+        Cp = calculate_heat_capacity(T_effect, x_f)
         Q_steam = W_s * lambda_t
         lambda_eff = latent_heat(T_effect)
-        V_film = (Q_steam - W_f * Cp * (T_effect - T_f)) / lambda_eff
-        v_bp = (W_bin * Cp * (T_bin - T_effect)) / lambda_eff
+        V_film = (Q_steam - W_f * Cp * (T_boiling - T_f)) / lambda_eff
+        v_bp = (W_bin * Cp * (T_bin - T_boiling)) / lambda_eff
         W_v = v_bp + V_film
         
 
@@ -80,6 +81,14 @@ def calculate_liquid_flow(sol):
 
     return (W_bout_vec)
     
+def calculate_heat_capacity(T, X):
+    a = 4206.8 - 6.6179 * X + 1.2288e-2 * X**2
+    b = -1.1262 + 5.4178e-2 * X - 2.2719e-4 * X**2
+    c = 1.2026e-2 - 5.3366e-4 * X + 1.8906e-6 * X**2
+    d = 6.8777e-7 + 1.517e-6 * X - 4.4267e-9 * X**2
+    cp = a + b * T + c * T**2 + d * T**3
+    return cp/1000  # Convert from J/kg°C to kJ/kg°C
+
 def plot(sol, W_v, W_b):
     import matplotlib.pyplot as plt
 
