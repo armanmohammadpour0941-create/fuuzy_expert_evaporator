@@ -28,8 +28,8 @@ def evaporator_corrected(t, X, U, D):
     l, x, T_b = X
     W_s, W_f = U
     T_f, x_f, W_bin, x_bin, T_bin = D
-    # if t > 1800 :
-    #    T_f = 30
+    if t > 1800 :
+       T_f = 30
 
     # Constants
     sea_dens = 1050    # kg/m3
@@ -48,18 +48,14 @@ def evaporator_corrected(t, X, U, D):
     lambda_b = latent_heat(T_v)  # kJ/kg
     lambda_t = latent_heat(T_t)  # kJ/kg
     
-    # Heat transfer coefficient (kW/m²°C)
-    U_ht = heat_transfer_coeff(T_b)
-    
     # Heat transfer rate (kW)
-    Q_transfer = U_ht * A_heat * ((T_t + T_f) - (2 * T_v)) / math.log((T_t - T_v) / abs((T_v - T_f)))
+    Q_transfer = heat_transfer_rate(T_b, x, T_f, T_t, A_heat)
     
     # Maximum heat available from steam (kW)
     Q_steam = W_s * lambda_t
     
     # Actual heat transfer (kW)
     Q_e = min(Q_transfer, Q_steam)
-    
     
     # Brine outlet flow (kg/s) - orifice equation
     kb = sea_dens * C_d * A_o * math.sqrt(2 * 9.8)
@@ -123,18 +119,17 @@ def evaporator_corrected(t, X, U, D):
     
     return [dldt, dxdt, dT_bdt]
 
-def calculate_vapor_flow(sol, W_s):
+def calculate_vapor_flow(sol, W_s, T_f=D[0]):
     T_t = 55           # heating steam temperature °C
     A_heat = 2000      # heat transfer area m2
-    
     
     x_vec = sol.y[1]
     T_b_vec = sol.y[2]
     W_v_vec = []
    
-    for i in range(0,len(T_b_vec)) :
-        # if i > 2500 :
-        #     W_s = 30
+    for i in range(len(T_b_vec)):
+        if i > 2500:
+            T_f = 30
         t_b = T_b_vec[i]
         x = x_vec[i]
         t_v = t_b - bpe(t_b, x)
@@ -142,23 +137,20 @@ def calculate_vapor_flow(sol, W_s):
         lambda_b = latent_heat(t_v)  # kJ/kg
         lambda_t = latent_heat(T_t)  # kJ/kg
         
-        # Heat transfer coefficient (kW/m²°C)
-        U_ht = heat_transfer_coeff(t_b)
-        
         # Heat transfer rate (kW)
-        Q_transfer = U_ht * A_heat * (T_t - t_b)
+        Q_transfer = heat_transfer_rate(t_b, x, T_f, T_t, A_heat)
         
         # Maximum heat available from steam (kW)
         Q_steam = W_s * lambda_t
         
         # Actual heat transfer (kW)
-        Q_e = min(Q_transfer, Q_steam) 
+        Q_e = min(Q_transfer, Q_steam)
     
         # Vaporization rate (kg/s)
-        W_v = Q_e / lambda_b
+        W_v = max(Q_e / lambda_b, 0.0)
 
         W_v_vec.append(W_v)
-    return (W_v_vec)
+    return W_v_vec
 
 def calculate_liquid_flow(sol):  
     sea_dens = 1050    # kg/m3
@@ -208,6 +200,17 @@ def heat_transfer_coeff(T):
     # Temperature dependent correlation
     U = 1.9695 + 1.2057e-2*T - 8.5989e-5*T**2 + 2.565e-7*T**3
     return max(U, 0.5)  # Ensure minimum value
+
+
+def heat_transfer_rate(T_b, x, T_f, T_t, A_heat):
+    """Heat transfer rate in kW from steam to brine."""
+    T_v = T_b - bpe(T_b, x)
+    # Prevent division by zero and ensure a physically meaningful driving temperature
+    delta_T1 = max(T_t - T_v, 0.1)
+    delta_T2 = max(T_v - T_f, 0.1)
+    U_ht = heat_transfer_coeff(T_b)
+    return U_ht * A_heat * ((T_t + T_f) - 2 * T_v) / math.log(delta_T1 / delta_T2)
+
 
 def plot(sol, W_v, W_b):
     import matplotlib.pyplot as plt
