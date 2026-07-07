@@ -9,21 +9,21 @@ def evaporator_dynamic_model(t, x, u, d):
 
     
       
-    if t > 1800:
+    # if t > 1800:
         #generate disturbances
         # T_f = 35  # feed temperature drops to 30°C after 180 seconds
         # x_f = 10  # feed salinity drops to 10% after 180 seconds
 
-        # W_bin = 2  # brine inlet flow drops to 2 kg/s after 180 seconds
+        # W_bin = 20  # brine inlet flow drops to 2 kg/s after 180 seconds
 
-        # x_bin = 8  # brine salinity drops to 8% after 180 seconds
+        # x_bin = 20  # brine salinity drops to 8% after 180 seconds
 
         # T_bin = 65  # brine temperature drops to 65°C after 180 seconds
 
         # #input changes
         # W_s = 35  # steam flow rate drops to 30 kg/s after 180 seconds
 
-        W_f = 150  # feed flow rate drops to 150 kg/s after 180 seconds
+        # W_f = 150  # feed flow rate drops to 150 kg/s after 180 seconds
         
     # Constants
     sea_dens = 1050    # kg/m3
@@ -49,7 +49,7 @@ def evaporator_dynamic_model(t, x, u, d):
     F_film_to_bp = W_f - V_film
     X_film = (W_f * x_f) / max(F_film_to_bp, 1e-3)  # Prevent division by zero
     
-    v_bp = (W_bin * Cp_bin * (T_bin - T_boiling)) / lambda_eff
+    v_bp = (M_bp * Cp_bin * (T_bin - T_boiling)) / lambda_eff
     # v_bp = max(v_bp, 0.0)  # Ensure non-negative vapor
     
     kb = sea_dens * C_d * A_o * math.sqrt(2 * 9.8)

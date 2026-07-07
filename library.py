@@ -89,7 +89,46 @@ def calculate_heat_capacity(T, X):
     cp = a + b * T + c * T**2 + d * T**3
     return cp/1000  # Convert from J/kg°C to kJ/kg°C
 
-def plot(sol, W_v, W_b):
+# def plot(sol, W_v, W_b):
+#     import matplotlib.pyplot as plt
+
+#     plt.figure(1)
+#     plt.plot(sol.t, sol.y[0], label="brine level")
+#     plt.xlabel("time (s)")
+#     plt.ylabel("level")
+#     plt.grid()
+#     plt.legend()
+
+#     plt.figure(2)
+#     plt.plot(sol.t, sol.y[1], label="salinity")
+#     plt.xlabel("time (s)")
+#     plt.ylabel("x")
+#     plt.grid()
+#     plt.legend()
+
+#     plt.figure(3)
+#     plt.plot(sol.t, sol.y[2], label="brine temperature")
+#     plt.xlabel("time (s)")
+#     plt.ylabel("Temperature")
+#     plt.grid()
+#     plt.legend()
+
+#     plt.figure(4)
+#     plt.plot(sol.t, W_v, label="vapor rate")
+#     plt.xlabel("time (s)")
+#     plt.ylabel("kg/h")
+#     plt.grid()
+#     plt.legend()
+
+#     plt.figure(5)
+#     plt.plot(sol.t, W_b, label="brine liq rate")
+#     plt.xlabel("time (s)")
+#     plt.ylabel("kg/h")
+#     plt.grid()
+#     plt.legend()
+
+#     plt.show() 
+def plot(sol):
     import matplotlib.pyplot as plt
 
     plt.figure(1)
@@ -100,30 +139,16 @@ def plot(sol, W_v, W_b):
     plt.legend()
 
     plt.figure(2)
-    plt.plot(sol.t, sol.y[1], label="salinity")
+    plt.plot(sol.t, sol.y[2], label="salinity")
     plt.xlabel("time (s)")
     plt.ylabel("x")
     plt.grid()
     plt.legend()
 
     plt.figure(3)
-    plt.plot(sol.t, sol.y[2], label="brine temperature")
+    plt.plot(sol.t, sol.y[1], label="brine temperature")
     plt.xlabel("time (s)")
     plt.ylabel("Temperature")
-    plt.grid()
-    plt.legend()
-
-    plt.figure(4)
-    plt.plot(sol.t, W_v, label="vapor rate")
-    plt.xlabel("time (s)")
-    plt.ylabel("kg/h")
-    plt.grid()
-    plt.legend()
-
-    plt.figure(5)
-    plt.plot(sol.t, W_b, label="brine liq rate")
-    plt.xlabel("time (s)")
-    plt.ylabel("kg/h")
     plt.grid()
     plt.legend()
 
