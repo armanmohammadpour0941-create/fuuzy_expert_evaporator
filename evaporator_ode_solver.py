@@ -7,7 +7,7 @@ def evaporator_ode_solver(t_span, t_eval, X0, U, D, T_sin):
         evaporator_dynamic_model,
         t_span,
         X0,
-        args=(U, D),
+        args=(U, D, T_sin),
         t_eval=t_eval,
         rtol=1e-6,
         atol=1e-9,

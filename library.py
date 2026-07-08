@@ -52,7 +52,7 @@ def calculate_vapor_flow(sol, u, T_sin, d):
     W_v_vec = []
    
     for i in range(len(t_effect_vec)):
-        if i > 2500:
+        # if i > 2500:
             #generate disturbances
             # T_f = 25  # feed temperature drops to 30°C after 180 seconds
             # x_f = 10  # feed salinity drops to 10% after 180 seconds
@@ -63,7 +63,7 @@ def calculate_vapor_flow(sol, u, T_sin, d):
 
             # T_bin = 45  # brine temperature drops to 65°C after 180 seconds
             
-            p_sat = 15.0  # saturation pressure (kPa)
+            # p_sat = 15.0  # saturation pressure (kPa)
 
             # #input changes
             # W_s = 25  # steam flow rate drops to 30 kg/s after 180 seconds
@@ -97,7 +97,7 @@ def calculate_liquid_flow(sol):
     W_bout_vec = []
    
     for i in range(0,len(l_vec)) :
-        if i > 2500:
+        # if i > 2500:
             #generate disturbances
             # T_f = 25  # feed temperature drops to 30°C after 180 seconds
             # x_f = 10  # feed salinity drops to 10% after 180 seconds
@@ -108,7 +108,7 @@ def calculate_liquid_flow(sol):
 
             # T_bin = 45  # brine temperature drops to 65°C after 180 seconds
             
-            p_sat = 15.0  # saturation pressure (kPa)
+            # p_sat = 15.0  # saturation pressure (kPa)
 
             # #input changes
             # W_s = 25  # steam flow rate drops to 30 kg/s after 180 seconds

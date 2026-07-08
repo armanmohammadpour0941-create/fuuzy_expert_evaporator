@@ -3,14 +3,14 @@ import numpy as np
 from library import *
 
 G = 9.81  # m/s^2
-def evaporator_dynamic_model(t, x, u, d):
+def evaporator_dynamic_model(t, x, u, d, T_sin):
     l, x_b, T_effect = x
     W_s, W_f = u
     T_f, x_f, W_bin, x_bin, T_bin, p_sat = d
 
     
       
-    if t > 1800:
+    # if t > 1800:
         #generate disturbances
         # T_f = 25  # feed temperature drops to 30°C after 180 seconds
         # x_f = 10  # feed salinity drops to 10% after 180 seconds
@@ -21,7 +21,7 @@ def evaporator_dynamic_model(t, x, u, d):
 
         # T_bin = 45  # brine temperature drops to 65°C after 180 seconds
         
-        p_sat = 15.0  # saturation pressure (kPa)
+        # p_sat = 15.0  # saturation pressure (kPa)
 
         # #input changes
         # W_s = 25  # steam flow rate drops to 30 kg/s after 180 seconds
@@ -32,8 +32,7 @@ def evaporator_dynamic_model(t, x, u, d):
     sea_dens = 1050    # kg/m3
     A = 8.64           # evaporator cross area m2
     A_o = 0.114        # cross area of brine outlet pipe
-    T_sin = 55         # heating steam temperature °C
-
+    
     M_bp = sea_dens * A * l  # mass of brine in the evaporator
     
     T_t = 0.5 * T_sin + 0.5 *T_effect
