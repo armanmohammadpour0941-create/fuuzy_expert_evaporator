@@ -1,6 +1,7 @@
 import math
+import numpy as np
 
-
+G = 9.81  # m/s^2
 def latent_heat(T):
     """Latent heat of vaporization in kJ/kg at temperature T (°C)"""
     # Using the Watson correlation with reference at 100°C (2257 kJ/kg)
@@ -47,19 +48,39 @@ def calculate_vapor_flow(sol, u, T_sin, d):
     W_s , W_f = u
     T_f, x_f, W_bin, x_bin, T_bin = d
     t_effect_vec = sol.y[2]
-    T_boiling = 50
+    x_b_vec = sol.y[1]
     W_v_vec = []
    
     for i in range(len(t_effect_vec)):
+        if i > 2500:
+            #generate disturbances
+            # T_f = 25  # feed temperature drops to 30°C after 180 seconds
+            # x_f = 10  # feed salinity drops to 10% after 180 seconds
+
+            # W_bin = 20  # brine inlet flow drops to 2 kg/s after 180 seconds
+
+            # x_bin = 10  # brine salinity drops to 8% after 180 seconds
+
+            # T_bin = 45  # brine temperature drops to 65°C after 180 seconds
+
+            # #input changes
+            # W_s = 25  # steam flow rate drops to 30 kg/s after 180 seconds
+
+            W_f = 120  # feed flow rate drops to 150 kg/s after 180 seconds
+      
         T_effect = t_effect_vec[i]
+        x_b = x_b_vec[i]
         T_t = (T_sin + T_effect) / 2
         lambda_t = latent_heat(T_t)
-        Cp = calculate_heat_capacity(T_effect, x_f)
-        Q_steam = W_s * lambda_t
+        Cp_f = calculate_heat_capacity(T_f, x_f)
+        Cp_bin = calculate_heat_capacity(T_bin, x_bin)
         lambda_eff = latent_heat(T_effect)
-        V_film = (Q_steam - W_f * Cp * (T_boiling - T_f)) / lambda_eff
-        v_bp = (W_bin * Cp * (T_bin - T_boiling)) / lambda_eff
-        W_v = v_bp + V_film
+        T_b = T_effect + calculate_bpe(T_effect, x_b)
+        t_sat = Tsat(10.0)
+        num = (W_s * lambda_t
+            - W_f * Cp_f * (t_sat - T_f)
+            + W_bin * Cp_bin * (T_bin - T_b))
+        W_v = num / lambda_eff  # Vapor flow rate (kg/s) 
         
 
         W_v_vec.append(W_v)
@@ -68,26 +89,56 @@ def calculate_vapor_flow(sol, u, T_sin, d):
 def calculate_liquid_flow(sol):  
     sea_dens = 1050    # kg/m3
     A_o = 0.114        # cross area of brine outlet pipe
-    C_d = 0.7          # discharge coefficient
-
+    
     l_vec = sol.y[0]
+    T_effect_vec = sol.y[2]
     W_bout_vec = []
    
     for i in range(0,len(l_vec)) :
+        if i > 2500:
+            #generate disturbances
+            # T_f = 25  # feed temperature drops to 30°C after 180 seconds
+            # x_f = 10  # feed salinity drops to 10% after 180 seconds
+
+            # W_bin = 20  # brine inlet flow drops to 2 kg/s after 180 seconds
+
+            # x_bin = 10  # brine salinity drops to 8% after 180 seconds
+
+            # T_bin = 45  # brine temperature drops to 65°C after 180 seconds
+
+            # #input changes
+            # W_s = 25  # steam flow rate drops to 30 kg/s after 180 seconds
+
+            W_f = 120  # feed flow rate drops to 150 kg/s after 180 seconds
+        T_effect = T_effect_vec[i]
         l = l_vec[i]
-        kb = sea_dens * C_d * A_o * math.sqrt(2 * 9.8)
-        W_bout = kb * math.sqrt(l)
+        p = Psat(T_effect) * 1000.0  # Pa
+        P_next = Psat(45.0) * 1000.0  # Pa
+        rho_next = 1070.0
+        L_next = 0.08
+        v_2 = 2.0 * G * ((p / (sea_dens * G)) + l - ((P_next + rho_next * G * L_next) / (sea_dens * G)))
+        v = np.sqrt(abs(v_2)) * np.sign(v_2)  # Brine outlet velocity (m/s)
+        W_bout = sea_dens * v * A_o  # Brine outlet flow rate (kg/s)
         W_bout_vec.append(W_bout)
 
     return (W_bout_vec)
     
 def calculate_heat_capacity(T, X):
+    X = X * 10.0  # convert weight percentage to g/kg
     a = 4206.8 - 6.6179 * X + 1.2288e-2 * X**2
     b = -1.1262 + 5.4178e-2 * X - 2.2719e-4 * X**2
     c = 1.2026e-2 - 5.3366e-4 * X + 1.8906e-6 * X**2
     d = 6.8777e-7 + 1.517e-6 * X - 4.4267e-9 * X**2
     cp = a + b * T + c * T**2 + d * T**3
     return cp/1000  # Convert from J/kg°C to kJ/kg°C
+
+def Psat(T_C): 
+    T = T_C
+    return (10.1724607 - 0.6167302 * T + 1.832849e-2 * T**2
+            - 1.77376e-4 * T**3 + 1.47068e-6 * T**4)    # P in kPa
+ 
+def Tsat(P_kPa):
+    return (42.6776 - (3892.7 / (np.log(P_kPa / 1000.0) - 9.48654))) - 273.15
 
 def plot(sol, W_v, W_b):
     import matplotlib.pyplot as plt

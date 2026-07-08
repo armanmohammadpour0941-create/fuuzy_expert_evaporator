@@ -12,11 +12,11 @@ U = [
 ]
 
 D = [
-    25,    # T_f - feed temperature (°C)
+    20,    # T_f - feed temperature (°C)
     7,     # x_f - feed salinity (wt% or fraction)
-    1,     # W_bin - brine inlet flow (kg/s)
+    10,     # W_bin - brine inlet flow (kg/s)
     6,     # x_bin - brine inlet salinity (fraction)
-    57,    # T_bin - brine inlet temperature (°C)
+    40,    # T_bin - brine inlet temperature (°C)
 ]
 
 t_span = (0, 3600)
