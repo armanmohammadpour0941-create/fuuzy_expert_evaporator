@@ -6,7 +6,7 @@ G = 9.81  # m/s^2
 def evaporator_dynamic_model(t, x, u, d):
     l, x_b, T_effect = x
     W_s, W_f = u
-    T_f, x_f, W_bin, x_bin, T_bin = d
+    T_f, x_f, W_bin, x_bin, T_bin, p_sat = d
 
     
       
@@ -20,11 +20,13 @@ def evaporator_dynamic_model(t, x, u, d):
         # x_bin = 10  # brine salinity drops to 8% after 180 seconds
 
         # T_bin = 45  # brine temperature drops to 65°C after 180 seconds
+        
+        p_sat = 15.0  # saturation pressure (kPa)
 
         # #input changes
         # W_s = 25  # steam flow rate drops to 30 kg/s after 180 seconds
 
-        W_f = 120  # feed flow rate drops to 150 kg/s after 180 seconds
+        # W_f = 120  # feed flow rate drops to 150 kg/s after 180 seconds
         
     # Constants
     sea_dens = 1050    # kg/m3
@@ -43,7 +45,7 @@ def evaporator_dynamic_model(t, x, u, d):
     Cp_eff = calculate_heat_capacity(T_effect, x_b)  # Heat capacity of brine in evaporator (kJ/kg°C)
     
     T_b = T_effect + calculate_bpe(T_effect, x_b)  # Boiling point elevation (°C)
-    t_sat = Tsat(15.0)  # Saturation temperature (°C)
+    t_sat = Tsat(p_sat)  # Saturation temperature (°C)
     num = (W_s * lambda_t
            - W_f * Cp_f * (t_sat - T_f)
            - W_bin * Cp_bin * (T_bin - T_b))

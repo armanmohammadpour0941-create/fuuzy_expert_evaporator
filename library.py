@@ -46,7 +46,7 @@ def heat_transfer_rate(T_b, x, T_f, T_t, A_heat):
 
 def calculate_vapor_flow(sol, u, T_sin, d):
     W_s , W_f = u
-    T_f, x_f, W_bin, x_bin, T_bin = d
+    T_f, x_f, W_bin, x_bin, T_bin, p_sat = d
     t_effect_vec = sol.y[2]
     x_b_vec = sol.y[1]
     W_v_vec = []
@@ -62,11 +62,13 @@ def calculate_vapor_flow(sol, u, T_sin, d):
             # x_bin = 10  # brine salinity drops to 8% after 180 seconds
 
             # T_bin = 45  # brine temperature drops to 65°C after 180 seconds
+            
+            p_sat = 15.0  # saturation pressure (kPa)
 
             # #input changes
             # W_s = 25  # steam flow rate drops to 30 kg/s after 180 seconds
 
-            W_f = 120  # feed flow rate drops to 150 kg/s after 180 seconds
+            # W_f = 120  # feed flow rate drops to 150 kg/s after 180 seconds
       
         T_effect = t_effect_vec[i]
         x_b = x_b_vec[i]
@@ -76,7 +78,7 @@ def calculate_vapor_flow(sol, u, T_sin, d):
         Cp_bin = calculate_heat_capacity(T_bin, x_bin)
         lambda_eff = latent_heat(T_effect)
         T_b = T_effect + calculate_bpe(T_effect, x_b)
-        t_sat = Tsat(10.0)
+        t_sat = Tsat(p_sat)
         num = (W_s * lambda_t
             - W_f * Cp_f * (t_sat - T_f)
             + W_bin * Cp_bin * (T_bin - T_b))
@@ -105,11 +107,13 @@ def calculate_liquid_flow(sol):
             # x_bin = 10  # brine salinity drops to 8% after 180 seconds
 
             # T_bin = 45  # brine temperature drops to 65°C after 180 seconds
+            
+            p_sat = 15.0  # saturation pressure (kPa)
 
             # #input changes
             # W_s = 25  # steam flow rate drops to 30 kg/s after 180 seconds
 
-            W_f = 120  # feed flow rate drops to 150 kg/s after 180 seconds
+            # W_f = 120  # feed flow rate drops to 150 kg/s after 180 seconds
         T_effect = T_effect_vec[i]
         l = l_vec[i]
         p = Psat(T_effect) * 1000.0  # Pa
