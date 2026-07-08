@@ -64,3 +64,28 @@ def run_simulation(cfg: MEDConfig, y0, t_span, n_eval):
                      t_eval=t_eval, rtol=1e-6, atol=1e-6, max_step=10.0)
     return sol
 
+def plot_sol(sol):
+    import matplotlib.pyplot as plt
+
+    plt.figure(1)
+    plt.plot(sol.t, sol.y[0], label="brine level")
+    plt.xlabel("time (s)")
+    plt.ylabel("level")
+    plt.grid()
+    plt.legend()
+
+    plt.figure(2)
+    plt.plot(sol.t, sol.y[2], label="salinity")
+    plt.xlabel("time (s)")
+    plt.ylabel("x")
+    plt.grid()
+    plt.legend()
+
+    plt.figure(3)
+    plt.plot(sol.t, sol.y[1], label="brine temperature")
+    plt.xlabel("time (s)")
+    plt.ylabel("Temperature")
+    plt.grid()
+    plt.legend()
+
+    plt.show() 
