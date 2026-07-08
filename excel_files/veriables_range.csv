@@ -1,0 +1,15 @@
+Column1	Column2	Column3	Column4	Column5	Column6
+variable_name(definition)	variable_name	unit	variable_type	lower bound	upper bound
+steam_flow_rate	W_s	kg/h	input(manipulated variable)		
+feed_flow_rate	W_f	kg/h	input(manipulated variable)		
+feed_temperature	T_f	deg C	disturbance		
+feed_salinity	X_f	weight percentage	disturbance		
+previous_effect_brine_flow_rate	W_b_in	kg/h	disturbance		
+previous_effect_brine_temperature	T_b_in	deg C	disturbance		
+previous_effect_brine_salinity	X_b_in	weight percentage	disturbance		
+effect_saturated_pressure	P_sat	kPa	disturbance		
+brine_pool_level	l	m	state		
+brine_pool_salinity	X_b 	weight percentage	state		
+effect_temperature	T_effect	deg C	state		
+vapor_flow_rate	W_v	kg/h	output variable		
+brine_outlet_flow_rate	W_b_out	kg/h	output variable		
