@@ -9,6 +9,7 @@ def evaporator_ode_solver(t_span, t_eval, X0, U, D, T_sin):
         X0,
         args=(U, D, T_sin),
         t_eval=t_eval,
+        method= 'BDF',  # Use BDF method for stiff problems
         rtol=1e-6,
         atol=1e-9,
         max_step=10  # Limit step size for stability
