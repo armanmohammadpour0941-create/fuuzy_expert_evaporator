@@ -1,5 +1,5 @@
 import numpy as np
-from evaporator_ode_solver import evaporator_ode_solver
+from less_accurate_model.evaporator_ode_solver import evaporator_ode_solver
 X0 = [
     0.1,   # brine level (m)
     0.1,   # salinity (fraction)

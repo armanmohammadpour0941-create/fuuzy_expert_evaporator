@@ -1,6 +1,6 @@
 from scipy.integrate import solve_ivp
-from evaporator_euation import evaporator_dynamic_model
-from library import calculate_vapor_flow, calculate_liquid_flow, plot
+from less_accurate_model.evaporator_euation import evaporator_dynamic_model
+from less_accurate_model.library import calculate_vapor_flow, calculate_liquid_flow, plot
 
 def evaporator_ode_solver(t_span, t_eval, X0, U, D, T_sin):
     sol = solve_ivp(
