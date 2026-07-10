@@ -14,7 +14,9 @@ def evaporator_ode_solver(t_span, t_eval, X0, u, distur, params):
         atol=1e-9,
         max_step=10  # Limit step size for stability
     )
-    sl.plot_solver_result(sol)
+    w_v = sl.calculate_vapor_flow_from_sol(sol, u, distur, params)
+    w_b = sl.calculate_liquid_flow_from_sol(sol, params)
+    sl.plot_complete_solution(sol, w_v, w_b)
 
     
     
