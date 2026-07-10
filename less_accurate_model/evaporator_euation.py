@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from library import *
+from less_accurate_model.library import *
 
 G = 9.81  # m/s^2
 def evaporator_dynamic_model(t, x, u, d, T_sin):

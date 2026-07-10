@@ -1,5 +1,5 @@
 import numpy as np
-from evaporator_ode_solver import evaporator_ode_solver
+from less_accurate_model.evaporator_ode_solver import evaporator_ode_solver
 X0 = [
     0.1,   # brine level (m)
     0.1,   # salinity (fraction)
@@ -17,7 +17,7 @@ D = [
     10,     # W_bin - brine inlet flow (kg/s)
     6,     # x_bin - brine inlet salinity (fraction)
     40,    # T_bin - brine inlet temperature (°C)
-    10.0   # p_sat - saturation pressure (kPa)
+    18.0   # p_sat - saturation pressure (kPa)
 ]
 
 t_span = (0, 3600)
