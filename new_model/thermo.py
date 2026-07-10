@@ -29,7 +29,7 @@ def calculate_vapor_density(T):
 
 
 def calculate_liquid_water_enthalpy(T):
-    T = T + 273.15
+    # T = T + 273.15
     h_b = 0.063635409 + 4.21 * T - 6.2e-4 * T**2 + 4.459e-6 * T**3
     return h_b
 
@@ -48,7 +48,7 @@ def calculate_steam_latent_heat(T):
 
 
 def calculate_heat_capacity(T, X):
-    T = T + 273.15    # convert to Kelvin
+    # T = T + 273.15    # convert to Kelvin
     X = X  # convert weight percentage to g/kg
     a = 4206.8 - 6.6179 * X + 1.2288e-2 * X**2
     b = -1.1262 + 5.4178e-2 * X - 2.2719e-4 * X**2
@@ -59,7 +59,7 @@ def calculate_heat_capacity(T, X):
 
 
 def bpe(T, X):
-    T = T + 273.15
+    # T = T + 273.15
     if X < 0.001:
         return 0
     # NaCl solution BPE

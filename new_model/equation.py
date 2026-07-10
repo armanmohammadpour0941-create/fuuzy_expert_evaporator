@@ -23,11 +23,10 @@ def med_equation(t, x, u, distur, params):
     t_t = 0.5 * t_sin + 0.5 * t_v
     t_b = t_v + th.bpe(t_v, x)
 
-    rho_f = th.calculate_liquid_density(t_f, x_f)  # density of feed (kg/m3)
     rho_b = th.calculate_liquid_density(t_b, x)  # density of brine pool (kg/m3)
     rho_v = th.calculate_vapor_density(t_v)  # density of vapor (kg/m3)
 
-    m_b = rho_f * A_s * l_b  # mass of brine in the evaporator (kg)
+    m_b = rho_b * A_s * l_b  # mass of brine in the evaporator (kg)
     m_v = rho_v * A_s * (H - l_b)  # mass of vapor in the evaporator (kg)
     m = m_b + m_v  # total mass in the evaporator (kg)
     alpha = m_v / m  # mass fraction of vapor in the evaporator
@@ -36,23 +35,21 @@ def med_equation(t, x, u, distur, params):
     lambda_v = th.calculate_steam_latent_heat(t_v)
     cp_f = th.calculate_heat_capacity(t_f, x_f)
     cp_bin = th.calculate_heat_capacity(t_bin, x_bin)
-    # cp_b = th.calculate_heat_capacity(t_b, x)
 
     h_f = th.calculate_liquid_water_enthalpy(t_f)
     h_bin = th.calculate_liquid_water_enthalpy(t_bin)
     h_b = th.calculate_liquid_water_enthalpy(t_b)
     h_v = th.calculate_vapor_water_enthalpy(t_v)
     h = (alpha * h_v) + ((1 - alpha) * h_b)
-    Q_e = th.heat_transfer_rate(t_t, t_v, A_e)
+    Q_e = th.heat_transfer_rate(t_sin, t_v, A_e)
     Q_e = min(w_s * lambda_s, Q_e)
     w_v = (
-        (w_s * lambda_s) - (w_f * cp_f * (t_v - t_f)) + (w_bin * cp_bin * (t_bin - t_v))
+        (Q_e) - (w_f * cp_f * (t_v - t_f)) + (w_bin * cp_bin * (t_bin - t_v))
     ) / lambda_v
 
-    # p_sat = th.Psat(t_v)
-    p_sat = 15.0 * 1000.0
+    p_sat = th.Psat(t_v) * 1000.0
     p_sat_next = (
-        p_sat - 2000.0
+        p_sat - 2500.0
     )  # saturated pressure in next effect must be lower then previous effect
     l_next = 0.08  # level of next effect
     rho_next = rho_b + 20.0  # density of next level
@@ -68,14 +65,13 @@ def med_equation(t, x, u, distur, params):
     v_b = np.sqrt(abs(v_2)) * np.sign(v_2)  # Brine outlet velocity (m/s)
     w_bout = rho_b * v_b * A_o
 
-    dl = (w_f + w_bin - w_bout - w_v) / (A_s * (rho_f - rho_v))
+    dl = (w_f + w_bin - w_bout - w_v) / (A_s * (rho_b - rho_v))
     dx = ((w_f * (x_f - x)) + (w_bin * (x_bin - x)) + (w_v * x)) / (m)
     dt = (
         Q_e
         + w_f * (h_f - h)
         + w_bin * (h_bin - h)
-        - w_bout * (h_b - h)
-        - w_v * (h_v - h)
+        - w_bout * (h_b - h)      
     ) / (
         m
         * (
