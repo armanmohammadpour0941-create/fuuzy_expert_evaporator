@@ -1,3 +1,4 @@
+import math
 def calculate_liquid_density(T, X):
     X = X * 10000.0  # convert salinity to ppm
 
@@ -76,3 +77,20 @@ def Psat(T_C):
     return (10.1724607 - 0.6167302 * T + 1.832849e-2 * T**2
             - 1.77376e-4 * T**3 + 1.47068e-6 * T**4)    # P in kPa
  
+def heat_transfer_coeff(T):
+    """Heat transfer coefficient in kW/m²°C"""
+    # Temperature dependent correlation
+    U = 1.9695 + 1.2057e-2*T - 8.5989e-5*T**2 + 2.565e-7*T**3
+    return U # Ensure minimum value
+
+def heat_transfer_rate(t_sin, t_f, t_v, a_e):
+    u = heat_transfer_coeff(t_v)
+    delta_t1 = t_sin - t_v
+    delta_t2 = t_v - t_f
+    if t_v - t_f <= 0.001:
+        delta_t2 = 0.01
+    lmtd = ((t_sin + t_f) - (2 * t_v)) / math.log(delta_t1 / delta_t2)
+    
+    q = u * a_e * lmtd
+    return q
+    

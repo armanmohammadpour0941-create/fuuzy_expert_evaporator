@@ -11,14 +11,14 @@ def med_equation(t, x, u, distur, params):
     t_sin = params.t_sin  # incoming steam temperature (°C)
     A_s = params.A_s  # cross-sectional area of the evaporator (m2)
     A_o = params.A_o  # cross-sectional area of the brine outlet pipe (m2)
+    A_e = params.A_e  # heat transfer area (m2)
     H = params.H  # height of the evaporator (m)
-    t_ref = params.t_ref  # refrence temperature (°C)
-    b = params.b
-    c = params.c
-    d = params.d
-    e = params.e
-    f = params.f
-    g = params.g
+    b = 4.21  # constant for enthalphy calculation
+    c = -6.2e-4  # constant for enthalphy calculation
+    d = 4.459e-6  # constant for enthalphy calculation
+    e = 1.8096  # constant for enthalphy calculation
+    f = 5.087e-4  # constant for enthalphy calculation
+    g = -1.221e-5  # constant for enthalphy calculation
 
     t_t = 0.5 * t_sin + 0.5 * t_v
     t_b = t_v + th.bpe(t_v, x)
@@ -38,21 +38,25 @@ def med_equation(t, x, u, distur, params):
     cp_bin = th.calculate_heat_capacity(t_bin, x_bin)
     cp_b = th.calculate_heat_capacity(t_b, x)
 
-    h_f = cp_f * (t_f - t_ref)
-    h_bin = cp_bin * (t_bin - t_ref)
-    h_b = cp_b * (t_b - t_ref)
+    # h_f = cp_f * (t_f - t_ref)
+    # h_bin = cp_bin * (t_bin - t_ref)
+    # h_b = cp_b * (t_b - t_ref)
+    h_f = th.calculate_liquid_water_enthalpy(t_f)
+    h_bin = th.calculate_liquid_water_enthalpy(t_bin)
+    h_b = th.calculate_liquid_water_enthalpy(t_b)
     h_v = th.calculate_vapor_water_enthalpy(t_v)
     h = (alpha * h_v) + ((1 - alpha) * h_b)
-
+    Q_e = th.heat_transfer_rate(t_sin, t_f, t_v, A_e)
+    Q_e = min(w_s * lambda_s, Q_e)
     w_v = (
         (w_s * lambda_s) - (w_f * cp_f * (t_v - t_f)) + (w_bin * cp_bin * (t_bin - t_v))
     ) / lambda_v
 
     p_sat = th.Psat(t_v)
     p_sat_next = (
-        p_sat - 10.0
+        p_sat - 20.0
     )  # saturated pressure in next effect must be lower then previous effect
-    l_next = l - 0.03  # level of next effect
+    l_next = 0.08  # level of next effect
     rho_next = rho_b + 20.0  # density of next level
     v_2 = (
         2.0
@@ -66,10 +70,10 @@ def med_equation(t, x, u, distur, params):
     v_b = np.sqrt(abs(v_2)) * np.sign(v_2)  # Brine outlet velocity (m/s)
     w_bout = rho_b * v_b * A_o
 
-    dl = (w_f + w_bin - w_bout, w_v) / (A_s * (rho_f - rho_v))
+    dl = (w_f + w_bin - w_bout - w_v) / (A_s * (rho_f - rho_v))
     dx = ((w_f * (x_f - x)) + (w_bin * (x_bin - x)) + (w_v * x)) / (m)
     dt = (
-        w_s * lambda_s
+        Q_e
         + w_f * (h_f - h)
         + w_bin * (h_bin - h)
         - w_bout * (h_b - h)
@@ -78,8 +82,8 @@ def med_equation(t, x, u, distur, params):
         m
         * (
             (alpha * (e + 2 * f * t_v + 3 * g * t_v**2))
-            + ((1 - alpha) * (b + 2 * c * t_v + 3 * d * t_v**2))
+            + ((1 - alpha) * (b + 2 * c * t_b + 3 * d * t_b**2))
         )
     )
-    
+
     return [dl, dx, dt]
