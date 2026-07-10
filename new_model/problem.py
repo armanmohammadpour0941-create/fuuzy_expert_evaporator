@@ -9,7 +9,7 @@ class Params:
     A_o: float         # cross area of brine outlet pipe(m2)
     A_e: float         # heat transfer area(m2)
     H: float           # hight of effect(m)
-    t_ref: float       # refrence temperature(deg C)
+    
     
 params = Params(
     t_sin=55.0,
@@ -17,7 +17,7 @@ params = Params(
     A_o=0.0118,
     A_e=2000.0,
     H=4.0,
-    t_ref=25.0)
+)
 
 x0 = [0.1, 
       0.1, 
