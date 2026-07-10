@@ -1,9 +1,71 @@
-def med_equation(t, x, u, d):
+import numpy as np
+import thermo as th
+
+
+def med_equation(t, x, u, distur, params):
     l, x, t_v = x
     w_s, w_f = u
-    t_f, x_f, w_bin, x_bin, t_bin, t_sin = d
+    t_f, x_f, w_bin, x_bin, t_bin = distur
 
-    m = A_s * l * (rho_f + rho_v * ((H / l) - 1))
+    G = 9.81  # gravity
+    t_sin = params.t_sin  # incoming steam temperature (°C)
+    A_s = params.A_s  # cross-sectional area of the evaporator (m2)
+    A_o = params.A_o  # cross-sectional area of the brine outlet pipe (m2)
+    H = params.H  # height of the evaporator (m)
+    t_ref = params.t_ref  # refrence temperature (°C)
+    b = params.b
+    c = params.c
+    d = params.d
+    e = params.e
+    f = params.f
+    g = params.g
+
+    t_t = 0.5 * t_sin + 0.5 * t_v
+    t_b = t_v + th.bpe(t_v, x)
+
+    rho_f = th.calculate_liquid_density(t_f, x_f)  # density of feed (kg/m3)
+    rho_b = th.calculate_liquid_density(t_b, x)  # density of brine pool (kg/m3)
+    rho_v = th.calculate_vapor_density(t_v)  # density of vapor (kg/m3)
+
+    m_b = rho_f * A_s * l  # mass of brine in the evaporator (kg)
+    m_v = rho_v * A_s * (H - l)  # mass of vapor in the evaporator (kg)
+    m = m_b + m_v  # total mass in the evaporator (kg)
+    alpha = m_v / m  # mass fraction of vapor in the evaporator
+
+    lambda_s = th.calculate_steam_latent_heat(t_t)
+    lambda_v = th.calculate_steam_latent_heat(t_v)
+    cp_f = th.calculate_heat_capacity(t_f, x_f)
+    cp_bin = th.calculate_heat_capacity(t_bin, x_bin)
+    cp_b = th.calculate_heat_capacity(t_b, x)
+
+    h_f = cp_f * (t_f - t_ref)
+    h_bin = cp_bin * (t_bin - t_ref)
+    h_b = cp_b * (t_b - t_ref)
+    h_v = th.calculate_vapor_water_enthalpy(t_v)
+    h = (alpha * h_v) + ((1 - alpha) * h_b)
+
+    w_v = (
+        (w_s * lambda_s) - (w_f * cp_f * (t_v - t_f)) + (w_bin * cp_bin * (t_bin - t_v))
+    ) / lambda_v
+
+    p_sat = th.Psat(t_v)
+    p_sat_next = (
+        p_sat - 10.0
+    )  # saturated pressure in next effect must be lower then previous effect
+    l_next = l - 0.03  # level of next effect
+    rho_next = rho_b + 20.0  # density of next level
+    v_2 = (
+        2.0
+        * G
+        * (
+            (p_sat / (rho_b * G))
+            + l
+            - ((p_sat_next + rho_next * G * l_next) / (rho_b * G))
+        )
+    )
+    v_b = np.sqrt(abs(v_2)) * np.sign(v_2)  # Brine outlet velocity (m/s)
+    w_bout = rho_b * v_b * A_o
+
     dl = (w_f + w_bin - w_bout, w_v) / (A_s * (rho_f - rho_v))
     dx = ((w_f * (x_f - x)) + (w_bin * (x_bin - x)) + (w_v * x)) / (m)
     dt = (
@@ -19,3 +81,5 @@ def med_equation(t, x, u, d):
             + ((1 - alpha) * (b + 2 * c * t_v + 3 * d * t_v**2))
         )
     )
+    
+    return [dl, dx, dt]
