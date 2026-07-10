@@ -3,8 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def calculate_vapor_flow_from_sol(sol, u, d, params):
-    w_s, w_f = u
-    t_f, x_f, w_bin, x_bin, t_bin = d
+    w_s_vec, w_f_vec = u
+    t_f_vec, x_f_vec, w_bin_vec, x_bin_vec, t_bin_vec = d
     t_v_vec = sol.y[2]
     t_sin = params.t_sin
     A_e = params.A_e
@@ -28,6 +28,14 @@ def calculate_vapor_flow_from_sol(sol, u, d, params):
         # W_s = 25  # steam flow rate drops to 30 kg/s after 180 seconds
 
         # W_f = 120  # feed flow rate drops to 150 kg/s after 180 seconds
+        w_s = w_s_vec[i]
+        w_f = w_f_vec[i]
+        t_f = t_f_vec[i]
+        x_f = x_f_vec[i]
+        w_bin = w_bin_vec[i]
+        x_bin = x_bin_vec[i]
+        t_bin = t_bin_vec[i]
+        
         t_v = t_v_vec[i]
         t_t = 0.5 * t_sin + 0.5 * t_v
         lambda_s = th.calculate_steam_latent_heat(t_t)

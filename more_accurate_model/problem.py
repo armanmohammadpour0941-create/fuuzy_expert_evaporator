@@ -19,24 +19,32 @@ params = Params(
     H=4.0,
 )
 
+t_span = (0, 3600)
+t_eval = np.linspace(0, 3600, 5000)
+n_eval = len(t_eval)
+
 x0 = [0.1, 
       0.5, 
       30.0
 ]
 
-u = [60, 
-     80
+w_s = [60] * n_eval
+w_f = [80] * n_eval
+u = [w_s, 
+     w_f
 ]  
 
+t_f = [20] * n_eval
+x_f = [4] * n_eval
+w_bin = [50] * n_eval
+x_bin = [6] * n_eval
+t_bin = [40] * n_eval
 d = [    
-    20,    # T_f - feed temperature (°C)
-    4,     # x_f - feed salinity (wt% or fraction)
-    50,     # W_bin - brine inlet flow (kg/s)
-    6,     # x_bin - brine inlet salinity (fraction)
-    40,    # T_bin - brine inlet temperature (°C)] 
+    t_f,    # T_f - feed temperature (°C)
+    x_f,     # x_f - feed salinity (wt% or fraction)
+    w_bin,     # W_bin - brine inlet flow (kg/s)
+    x_bin,     # x_bin - brine inlet salinity (fraction)
+    t_bin,    # T_bin - brine inlet temperature (°C)] 
 ] 
 
-t_span = (0, 3600)
-t_eval = np.linspace(0, 3600, 5000)
-
-solver.evaporator_ode_solver(t_span, t_eval, x0, u, d, params)
+solver.evaporator_ode_solver(t_span, t_eval, x0, u, d, t_eval, params)

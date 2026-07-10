@@ -2,11 +2,20 @@ import numpy as np
 import thermo as th
 
 
-def med_equation(t, x, u, distur, params):
+def med_equation(t, x, u, distur, params, time_vec):
     l_b, x, t_v = x
-    w_s, w_f = u
-    t_f, x_f, w_bin, x_bin, t_bin = distur
-
+    w_s_vec, w_f_vec = u
+    t_f_vec, x_f_vec, w_bin_vec, x_bin_vec, t_bin_vec = distur
+    
+  
+    w_s = np.interp(t, time_vec, w_s_vec)
+    w_f = np.interp(t, time_vec, w_f_vec)
+    t_f = np.interp(t, time_vec, t_f_vec)
+    x_f = np.interp(t, time_vec, x_f_vec)
+    w_bin = np.interp(t, time_vec, w_bin_vec)
+    x_bin = np.interp(t, time_vec, x_bin_vec)
+    t_bin = np.interp(t, time_vec, t_bin_vec)
+    
     G = 9.81  # gravity
     t_sin = params.t_sin  # incoming steam temperature (°C)
     A_s = params.A_s  # cross-sectional area of the evaporator (m2)

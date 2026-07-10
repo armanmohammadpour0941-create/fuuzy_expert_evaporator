@@ -2,12 +2,12 @@ from scipy.integrate import solve_ivp
 from equation import med_equation
 import solution as sl
 
-def evaporator_ode_solver(t_span, t_eval, X0, u, distur, params):
+def evaporator_ode_solver(t_span, t_eval, X0, u, distur, time_vec, params):
     sol = solve_ivp(
         med_equation,
         t_span,
         X0,
-        args=(u, distur, params),
+        args=(u, distur, params, time_vec),
         t_eval=t_eval,
         method='BDF',
         rtol=1e-6,
@@ -17,6 +17,7 @@ def evaporator_ode_solver(t_span, t_eval, X0, u, distur, params):
     w_v = sl.calculate_vapor_flow_from_sol(sol, u, distur, params)
     w_b = sl.calculate_liquid_flow_from_sol(sol, params)
     sl.plot_complete_solution(sol, w_v, w_b)
+    # sl.plot_solver_result(sol)
 
     
     
