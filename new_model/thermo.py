@@ -1,4 +1,3 @@
-import math
 def calculate_liquid_density(T, X):
     X = X * 10000.0  # convert salinity to ppm
 
@@ -30,11 +29,13 @@ def calculate_vapor_density(T):
 
 
 def calculate_liquid_water_enthalpy(T):
+    T = T + 273.15
     h_b = 0.063635409 + 4.21 * T - 6.2e-4 * T**2 + 4.459e-6 * T**3
     return h_b
 
 
 def calculate_vapor_water_enthalpy(T):
+    T = T + 273.15
     h_v = 2501.689 + 1.8096 * T + 5.087e-4 * T**2 - 1.221e-5 * T**3
     return h_v
 
@@ -47,7 +48,8 @@ def calculate_steam_latent_heat(T):
 
 
 def calculate_heat_capacity(T, X):
-    X = X * 10.0  # convert weight percentage to g/kg
+    T = T + 273.15    # convert to Kelvin
+    X = X  # convert weight percentage to g/kg
     a = 4206.8 - 6.6179 * X + 1.2288e-2 * X**2
     b = -1.1262 + 5.4178e-2 * X - 2.2719e-4 * X**2
     c = 1.2026e-2 - 5.3366e-4 * X + 1.8906e-6 * X**2
@@ -57,8 +59,7 @@ def calculate_heat_capacity(T, X):
 
 
 def bpe(T, X):
-    """Boiling point elevation in °C"""
-    # More accurate correlation
+    T = T + 273.15
     if X < 0.001:
         return 0
     # NaCl solution BPE
@@ -70,7 +71,7 @@ def bpe(T, X):
     b1 = 0.0540
     b2 = -0.0002
     bpe = (a0 + a1 * X + a2 * X**2 + a3 * X**3) * T + (b0 + b1 * X + b2 * X**2)
-    return max(bpe, 0)
+    return bpe
 
 def Psat(T_C): 
     T = T_C
@@ -83,14 +84,9 @@ def heat_transfer_coeff(T):
     U = 1.9695 + 1.2057e-2*T - 8.5989e-5*T**2 + 2.565e-7*T**3
     return U # Ensure minimum value
 
-def heat_transfer_rate(t_sin, t_f, t_v, a_e):
+def heat_transfer_rate(t_t, t_v, a_e):
     u = heat_transfer_coeff(t_v)
-    delta_t1 = t_sin - t_v
-    delta_t2 = t_v - t_f
-    if t_v - t_f <= 0.001:
-        delta_t2 = 0.01
-    lmtd = ((t_sin + t_f) - (2 * t_v)) / math.log(delta_t1 / delta_t2)
     
-    q = u * a_e * lmtd
+    q = u * a_e * (t_t - t_v)
     return q
     
