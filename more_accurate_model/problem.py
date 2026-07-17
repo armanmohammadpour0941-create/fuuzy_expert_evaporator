@@ -27,18 +27,42 @@ x0 = [0.1,
       0.5, 
       30.0
 ]
-
 w_s = [60] * n_eval
 w_f = [80] * n_eval
-u = [w_s, 
-     w_f
-]  
 
 t_f = [20] * n_eval
 x_f = [4] * n_eval
 w_bin = [50] * n_eval
 x_bin = [6] * n_eval
 t_bin = [40] * n_eval
+
+for i in range(int(n_eval / 2), n_eval):
+    change_precentage = 0.1
+    # input positive change +10%
+    # w_s[i] = 60 * (1 + change_precentage)
+    # w_f[i] = 80 * (1 + change_precentage)
+    # input negative change -10%
+    # w_s[i] = 60 * (1 - change_precentage)
+    # w_f[i] = 80 * (1 - change_precentage)
+    
+    # disturbance positive change +10%
+    # t_f[i] = 20 * (1 + change_precentage)
+    # x_f[i] = 4 * (1 + change_precentage)
+    # w_bin[i] = 50 * (1 + change_precentage)
+    # x_bin[i] = 6 * (1 + change_precentage)
+    # t_bin[i] = 40 * (1 + change_precentage)
+    
+    # disturbance negative change -10%
+    # t_f[i] = 20 * (1 - change_precentage)
+    # x_f[i] = 4 * (1 - change_precentage)
+    # w_bin[i] = 50 * (1 - change_precentage)
+    # x_bin[i] = 6 * (1 - change_precentage)
+    # t_bin[i] = 40 * (1 - change_precentage)
+    
+    
+u = [w_s, 
+     w_f
+]
 d = [    
     t_f,    # T_f - feed temperature (°C)
     x_f,     # x_f - feed salinity (wt% or fraction)
