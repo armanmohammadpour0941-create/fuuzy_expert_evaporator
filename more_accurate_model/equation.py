@@ -51,16 +51,16 @@ def med_equation(t, x, u, distur, params, time_vec):
     h_v = th.calculate_vapor_water_enthalpy(t_v)
     h = (alpha * h_v) + ((1 - alpha) * h_b)
     Q_e = th.heat_transfer_rate(t_sin, t_v, A_e)
-    Q_e = min(w_s * lambda_s, Q_e)
+    Q_e = max(w_s * lambda_s, Q_e)
     w_v = (
-        (Q_e) - (w_f * cp_f * (t_v - t_f)) + (w_bin * cp_bin * (t_bin - t_v))
+        (Q_e) - (w_f * cp_f * (t_v - t_f)) + (w_bin * cp_bin * (t_bin - t_b))
     ) / lambda_v
 
     p_sat = th.Psat(t_v) * 1000.0
     p_sat_next = (
         p_sat - 2500.0
     )  # saturated pressure in next effect must be lower then previous effect
-    l_next = 0.08  # level of next effect
+    l_next = 0.0  # level of next effect
     rho_next = rho_b + 20.0  # density of next level
     v_2 = (
         2.0

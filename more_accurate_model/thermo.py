@@ -50,9 +50,9 @@ def calculate_steam_latent_heat(T):
 def calculate_heat_capacity(T, X):
     # T = T + 273.15    # convert to Kelvin
     X = X  # convert weight percentage to g/kg
-    a = 4206.8 - 6.6179 * X + 1.2288e-2 * X**2
+    a = 4206.8 + 6.6179 * X + 1.2288e-2 * X**2
     b = -1.1262 + 5.4178e-2 * X - 2.2719e-4 * X**2
-    c = 1.2026e-2 - 5.3366e-4 * X + 1.8906e-6 * X**2
+    c = 1.2026e-2 + 5.3366e-4 * X + 1.8906e-6 * X**2
     d = 6.8777e-7 + 1.517e-6 * X - 4.4267e-9 * X**2
     cp = a + b * T + c * T**2 + d * T**3
     return cp / 1000  # Convert from J/kg°C to kJ/kg°C
