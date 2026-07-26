@@ -17,7 +17,7 @@ def evaporator_ode_solver(t_span, t_eval, X0, u, distur, time_vec, params):
     w_v = sl.calculate_vapor_flow_from_sol(sol, u, distur, params)
     w_b = sl.calculate_liquid_flow_from_sol(sol, params)
     sl.print_final_value(sol, w_v, w_b)
-    # sl.plot_complete_solution(sol, w_v, w_b)
+    sl.plot_complete_solution(sol, w_v, w_b)
     # sl.plot_solver_result(sol)
 
     
