@@ -183,3 +183,12 @@ def print_final_value(sol, w_v, w_bout):
     print(
         f"brine pool level: {level:.2f} m\nbrinepool salinity: {x_b:.2f} weight percentage\neffect temperature: {t_v:.2f} deg C\nvapor flow rate: {w_v:.2f} kg/s\nliquid flow rate: {w_bout:.2f} kg/s"
     )
+
+def plot_time_vector(sol, vector, vector_name: str, unit: str):
+    
+    plt.plot(sol.t, vector, label=vector_name)
+    plt.xlabel("time (s)")
+    plt.ylabel(unit)
+    plt.grid()
+    plt.legend()
+    plt.show()

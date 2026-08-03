@@ -1,6 +1,10 @@
-import numpy as np
 from dataclasses import dataclass
-import solver 
+
+import index_calculation as ic
+import numpy as np
+import solution as sl
+import solver
+
 
 @dataclass
 class Params:
@@ -71,4 +75,13 @@ d = [
     t_bin,    # T_bin - brine inlet temperature (°C)] 
 ] 
 
-solver.evaporator_ode_solver(t_span, t_eval, x0, u, d, t_eval, params)
+sol = solver.evaporator_ode_solver(t_span, t_eval, x0, u, d, t_eval, params)
+w_v = sl.calculate_vapor_flow_from_sol(sol, u, d, params)
+w_b = sl.calculate_liquid_flow_from_sol(sol, params)
+sl.print_final_value(sol, w_v, w_b)
+sl.plot_complete_solution(sol, w_v, w_b)
+
+# calculation Indices
+i_q = ic.calculate_heat_index(sol, u)
+sl.plot_time_vector(sol, i_q, "heat Index", "kj/h")
+sl.plot_solver_result(sol)

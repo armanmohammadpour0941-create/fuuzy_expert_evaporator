@@ -33,12 +33,26 @@ def calculate_liquid_water_enthalpy(T):
     h_b = 0.063635409 + 4.21 * T - 6.2e-4 * T**2 + 4.459e-6 * T**3
     return h_b
 
+def calculate_liquid_water_enthalpy_as_vec(T_vec: list[float]):
+    # T = T + 273.15
+    h_b_vec = []
+    for T in T_vec:
+        h_b = 0.063635409 + 4.21 * T - 6.2e-4 * T**2 + 4.459e-6 * T**3
+        h_b_vec.append(h_b)
+    return h_b_vec
 
 def calculate_vapor_water_enthalpy(T):
     T = T + 273.15
     h_v = 2501.689 + 1.8096 * T + 5.087e-4 * T**2 - 1.221e-5 * T**3
     return h_v
 
+def calculate_vapor_water_enthalpy_as_vec(T_vec: list[float]):
+    h_V_vec = []
+    for T in T_vec:
+        T = T + 273.15
+        h_v = 2501.689 + 1.8096 * T + 5.087e-4 * T**2 - 1.221e-5 * T**3
+        h_V_vec.append(h_v)
+    return h_V_vec
 
 def calculate_steam_latent_heat(T):
     h_b = calculate_liquid_water_enthalpy(T)
@@ -46,10 +60,15 @@ def calculate_steam_latent_heat(T):
     latent_heat = h_v - h_b
     return latent_heat
 
+def calculate_steam_latent_heat_as_vec(T_vec: list[float]):
+    h_b_vec = calculate_liquid_water_enthalpy_as_vec(T_vec)
+    h_v_vec = calculate_vapor_water_enthalpy_as_vec(T_vec)
+    latent_heat_vec = [h_v - h_b for h_v, h_b in zip(h_v_vec, h_b_vec)]
+    return latent_heat_vec
 
 def calculate_heat_capacity(T, X):
     # T = T + 273.15    # convert to Kelvin
-    X = X  # convert weight percentage to g/kg
+    X = X  # convert weight percentage to g/kg  # noqa: PLW0127
     a = 4206.8 + 6.6179 * X + 1.2288e-2 * X**2
     b = -1.1262 + 5.4178e-2 * X - 2.2719e-4 * X**2
     c = 1.2026e-2 + 5.3366e-4 * X + 1.8906e-6 * X**2
