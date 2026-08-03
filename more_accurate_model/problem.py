@@ -78,10 +78,11 @@ d = [
 sol = solver.evaporator_ode_solver(t_span, t_eval, x0, u, d, t_eval, params)
 w_v = sl.calculate_vapor_flow_from_sol(sol, u, d, params)
 w_b = sl.calculate_liquid_flow_from_sol(sol, params)
-sl.print_final_value(sol, w_v, w_b)
-sl.plot_complete_solution(sol, w_v, w_b)
+
+# sl.plot_complete_solution(sol, w_v, w_b)
+# sl.plot_solver_result(sol)
 
 # calculation Indices
-i_q = ic.calculate_heat_index(sol, u)
-sl.plot_time_vector(sol, i_q, "heat Index", "kj/h")
-sl.plot_solver_result(sol)
+(indices, label, unit) = ic.calculate_all_indices(sol, u, d, params)
+sl.print_final_value(sol, w_v, w_b, indices)
+sl.plot_indices(sol, indices, label, unit)
