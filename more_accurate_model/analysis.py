@@ -1,8 +1,6 @@
-from builtins import list
+import csv
 
 import index_calculation as ic
-import csv
-import pandas as pd
 import solution as sl
 import solver
 
@@ -118,7 +116,7 @@ def find_states_and_outputs_bound(
 
 
 
-def save_result_to_csv(result, filename="result.csv"):
+def save_result_to_csv(result, filename="excel_files/output_result.csv"):
     with open(filename, "w", newline="", encoding="utf-8") as csvfile:
         writer = csv.writer(csvfile)
 
