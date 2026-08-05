@@ -1,4 +1,8 @@
+from builtins import list
+
 import index_calculation as ic
+import csv
+import pandas as pd
 import solution as sl
 import solver
 
@@ -111,3 +115,19 @@ def find_states_and_outputs_bound(
                 output_result_per_variable[j].append(iteration_result[j])
         output_resutl.append(output_result_per_variable)
     return output_resutl
+
+
+
+def save_result_to_csv(result, filename="result.csv"):
+    with open(filename, "w", newline="", encoding="utf-8") as csvfile:
+        writer = csv.writer(csvfile)
+
+        # Header (optional)
+        num_cols = len(result[0])
+        writer.writerow([f"Col {i}" for i in range(num_cols)])
+
+        # Write each row
+        for row in result:
+            writer.writerow([f"[{x:.6f}, {y:.6f}]" for x, y in row])
+
+    print(f"CSV file saved as '{filename}'")

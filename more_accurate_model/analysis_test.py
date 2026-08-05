@@ -41,4 +41,4 @@ disturbance_ranges = [
 ]
 
 res = analysis.find_states_and_outputs_bound(t_span, t_eval, x0, input_ranges, disturbance_ranges, t_eval, params)
-print(res)
+analysis.save_result_to_csv(res)
