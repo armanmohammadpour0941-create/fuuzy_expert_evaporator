@@ -38,12 +38,12 @@ t_f = [20] * n_eval
 x_f = [4] * n_eval
 w_bin = [50] * n_eval
 x_bin = [6] * n_eval
-t_bin = [40] * n_eval
+t_bin = [25] * n_eval
 
 for i in range(int(n_eval / 2), n_eval):
-    change_precentage = 1
-    # input positive change +10%
-    # w_s[i] = 20 * (1 + change_precentage)
+    change_precentage = 0.2
+
+    w_s[i] = 20 * (1 + change_precentage)
     # w_f[i] = 80 * (1 + change_precentage)
     # input negative change -10%
     # w_s[i] = 20 * (1 - change_precentage)
@@ -79,10 +79,11 @@ sol = solver.evaporator_ode_solver(t_span, t_eval, x0, u, d, t_eval, params)
 w_v = sl.calculate_vapor_flow_from_sol(sol, u, d, params)
 w_b = sl.calculate_liquid_flow_from_sol(sol, params)
 
-# sl.plot_complete_solution(sol, w_v, w_b)
+
 # sl.plot_solver_result(sol)
 
 # calculation Indices
 (indices, label, unit) = ic.calculate_all_indices(sol, u, d, params)
 sl.print_final_value(sol, w_v, w_b, indices)
-sl.plot_indices(sol, indices, label, unit)
+sl.plot_complete_solution(sol, w_v, w_b)
+# sl.plot_indices(sol, indices, label, unit)

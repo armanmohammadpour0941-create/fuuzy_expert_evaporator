@@ -2,9 +2,9 @@ import thermo as th
 
 
 def calculate_all_indices(sol, u, d, params):
-    i_q = calculate_heat_index(sol, u)
-    i_th_f = calculate_feed_thermal_input_index(sol, u, d)
-    i_th_b = calculate_brine_thermal_input_index(sol, d)
+    i_q = calculate_heat_index(u)
+    i_th_f = calculate_feed_thermal_input_index(u, d)
+    i_th_b = calculate_brine_thermal_input_index(d)
     i_w_in = calculate_inlet_flow_index(u, d)
     i_s_in =calculate_salt_inlet_index(u, d)
     i_h = calculate_hold_up_index(sol, params)
@@ -14,40 +14,37 @@ def calculate_all_indices(sol, u, d, params):
     unit_vec = ["kj/h", "kj/h", "kj/h", "kg/h", "", "kg","kj/kg"]
     return (indices_vec, label_vec, unit_vec)
 
-def calculate_heat_index(sol, u):
+def calculate_heat_index(u):
     w_s_vec, _ = u
-    t_v_vec = sol.y[2]
-    lambda_s_vec = th.calculate_steam_latent_heat_as_vec(t_v_vec)
+    t_sin = [55] * len(w_s_vec)
+    lambda_s_vec = th.calculate_steam_latent_heat_as_vec(t_sin)
     I_q = [w_s * lambda_s for w_s, lambda_s in zip(w_s_vec, lambda_s_vec)]
     return I_q
 
 
-def calculate_feed_thermal_input_index(sol, u, d):
+def calculate_feed_thermal_input_index(u, d):
     _, w_f_vec = u
     t_f_vec, x_f_vec, _, _, _ = d
-    t_v_vec = sol.y[2]
+    
     I_th_f_vec = []
-    for i in range(len(t_v_vec)):          
-        t_v = t_v_vec[i]
+    for i in range(len(w_f_vec)):          
         w_f = w_f_vec[i]
         t_f = t_f_vec[i]
         x_f = x_f_vec[i]
         cp_f = th.calculate_heat_capacity(t_f, x_f)
-        I_th_f = w_f * cp_f * (t_v - t_f)
+        I_th_f = w_f * cp_f * t_f
         I_th_f_vec.append(I_th_f)
     return I_th_f_vec
 
-def calculate_brine_thermal_input_index(sol, d):
+def calculate_brine_thermal_input_index(d):
     _, _, w_bin_vec, x_bin_vec, t_bin_vec = d
-    t_v_vec = sol.y[2]
     I_th_b_vec = []
-    for i in range(len(t_v_vec)):          
-        t_v = t_v_vec[i]
+    for i in range(len(w_bin_vec)):          
         w_bin = w_bin_vec[i]
         t_bin = t_bin_vec[i]
         x_bin = x_bin_vec[i]
         cp_bin = th.calculate_heat_capacity(t_bin, x_bin)
-        I_th_b = w_bin * cp_bin * (t_v - t_bin)
+        I_th_b = w_bin * cp_bin * t_bin
         I_th_b_vec.append(I_th_b)
     return I_th_b_vec
 
