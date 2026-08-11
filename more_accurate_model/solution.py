@@ -186,17 +186,13 @@ def print_final_value(sol, w_v, w_bout, indices):
     w_v = w_v[-1]
     w_bout = w_bout[-1]
     i_q = indices[0][-1]
-    i_th_f = indices[1][-1]
-    i_th_b = indices[2][-1]
-    i_w_in = indices[3][-1]
-    i_s_in = indices[4][-1]
-    i_h = indices[5][-1]
-    i_h_in = indices[6][-1]
+    i_w_in = indices[1][-1]
+    i_h_in = indices[2][-1]
     print(
         f"brine pool level: {level:.2f} m\nbrinepool salinity: {x_b:.2f} weight percentage\neffect temperature: {t_v:.2f} deg C\nvapor flow rate: {w_v:.2f} kg/s\nliquid flow rate: {w_bout:.2f} kg/s"
     )
     print(
-        f"heat Index: {i_q:.2f} kj/h\nfeed thermal index: {i_th_f:.2f} kj/h\nbrine thermal index: {i_th_b:.2f} kj/h\ninlet flow index: {i_w_in:.2f} kg/h\ninlet salt index: {i_s_in:.2f} \nhold up index: {i_h:.2f} kg\ninlet enthalpy index: {i_h_in:.2f} kj/kg"
+        f"heat Index: {i_q:.2f} kj/h\ninlet flow index: {i_w_in:.2f} kg/h\ninlet enthalpy index: {i_h_in:.2f} kj/kg"
     )
 
 def plot_indices(
