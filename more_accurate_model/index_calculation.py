@@ -97,9 +97,11 @@ def calculate_vapor_energy(sol, u, d, params):
 
 # E_w_b
 def calculate_liquid_energy(sol, params):
+    # x_vec = sol.y[1]
     t_vec = sol.y[2]
+    t_b_vec = [t_v + 65.0 for t_v in t_vec]
     w_b_vec = sl.calculate_liquid_flow_from_sol(sol, params)
-    h_b_vec = th.calculate_liquid_water_enthalpy_as_vec(t_vec)
+    h_b_vec = th.calculate_liquid_water_enthalpy_as_vec(t_b_vec)
     E_w_b = [w_b * h_b for w_b, h_b in zip(w_b_vec, h_b_vec)]
     return E_w_b
     

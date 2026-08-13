@@ -80,5 +80,5 @@ w_b = sl.calculate_liquid_flow_from_sol(sol, params)
 # calculation Indices
 (indices, label, unit) = ic.calculate_all_indices(sol, u, d, params)
 sl.print_final_value(sol, w_v, w_b, indices)
-sl.plot_complete_solution(sol, w_v, w_b)
+# sl.plot_complete_solution(sol, w_v, w_b)
 # sl.plot_indices(sol, indices, label, unit)
