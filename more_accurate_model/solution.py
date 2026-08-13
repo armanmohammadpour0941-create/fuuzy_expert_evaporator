@@ -5,11 +5,17 @@ import thermo as th
 
 def calculate_vapor_flow_from_sol(sol, u, d, params):
     w_s_vec, w_f_vec = u
-    t_f_vec, x_f_vec, w_bin_vec, x_bin_vec, t_bin_vec = d
+    t_f_vec, w_bin_vec = d
+    
+    x_f_vec = params.seawater_salinity
+    x_bin_vec = params.previous_brine_salinity
+    t_bin_vec = params.previous_brine_temp
+    
     t_v_vec = sol.y[2]
     x_vec = sol.y[1]
     t_sin = params.t_sin
     A_e = params.A_e
+    bt = params.boiling_temp
     W_v_vec = []
 
     for i in range(len(t_v_vec)):
@@ -49,10 +55,9 @@ def calculate_vapor_flow_from_sol(sol, u, d, params):
 
         Q_e = th.heat_transfer_rate(t_sin, t_v, A_e)
         Q_e = max(w_s * lambda_s, Q_e)
-        w_v = (
-            (Q_e) - (w_f * cp_f * (t_v - t_f)) + (w_bin * cp_bin * (t_bin - t_b))
-        ) / lambda_v
-
+        w_v_t = ((Q_e) + (w_f * cp_f * (t_f - bt))) / lambda_v
+        w_v_f = w_bin * cp_bin * (t_bin - t_b ) / lambda_v
+        w_v = w_v_t + w_v_f
         W_v_vec.append(w_v)
     return W_v_vec
 
@@ -90,9 +95,9 @@ def calculate_liquid_flow_from_sol(sol, params):
 
         rho = th.calculate_liquid_density(t_b, x_b)
         p_sat = th.Psat(t_v) * 1000.0
-        p_sat_next = p_sat - 2500.0
+        p_sat_next = p_sat - 2000.0
         l_next = 0.0
-        rho_next = rho + 20.0
+        rho_next = rho + 5.0
         v_2 = (
             2.0
             * G
@@ -180,18 +185,19 @@ def print_final_value(sol, w_v, w_bout, indices):
     t_v = sol.y[2][-1]
     w_v = w_v[-1]
     w_bout = w_bout[-1]
-    i_q = indices[0][-1]
-    i_th_f = indices[1][-1]
-    i_th_b = indices[2][-1]
-    i_w_in = indices[3][-1]
-    i_s_in = indices[4][-1]
-    i_h = indices[5][-1]
-    i_h_in = indices[6][-1]
+    i_w_in = indices[0][-1]
+    i_s_in = indices[1][-1]
+    E_s = indices[2][-1]
+    E_w_v = indices[3][-1] 
+    E_w_b = indices[4][-1]
+    E_h_out = indices[5][-1]
+    E_h_in = indices[6][-1]
+    E_h = indices[7][-1]
     print(
         f"brine pool level: {level:.2f} m\nbrinepool salinity: {x_b:.2f} weight percentage\neffect temperature: {t_v:.2f} deg C\nvapor flow rate: {w_v:.2f} kg/s\nliquid flow rate: {w_bout:.2f} kg/s"
     )
     print(
-        f"heat Index: {i_q:.2f} kj/h\nfeed thermal index: {i_th_f:.2f} kj/h\nbrine thermal index: {i_th_b:.2f} kj/h\ninlet flow index: {i_w_in:.2f} kg/h\ninlet salt index: {i_s_in:.2f} \nhold up index: {i_h:.2f} kg\ninlet enthalpy index: {i_h_in:.2f} kj/kg"
+        f"I_w_in: {i_w_in:.2f}\nI_s_in: {i_s_in:.2f}\nE_s: {E_s:.2f}\nE_w_v: {E_w_v:.2f}\nE_w_b: {E_w_b:.2f}\nE_h_out: {E_h_out:.2f}\nE_h_in: {E_h_in:.2f}\nE_h: {E_h:.2f}"
     )
 
 def plot_indices(
