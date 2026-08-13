@@ -89,6 +89,6 @@ def med_equation(t, x, u, distur, params, time_vec):
         - (w_v_t * x_fp)
         - (w_v_f * x_binp)
     ) / (m)
-    dt = (Q_e + w_f * (h_f - h) + w_bin * (h_bin - h) - w_v * (h_b - h)) / (m * cp_b)
+    dt = (Q_e + w_f * (h_f - h) + w_bin * (h_bin - h) - w_v * (h - h_b)) / (m * cp_b)
 
     return [dl, dx, dt]

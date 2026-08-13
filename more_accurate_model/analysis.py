@@ -35,7 +35,7 @@ def find_states_and_outputs_bound(
     ]
     output_resutl: list[list[list[float]]] = []
     for name, value in input_and_distur_vec:
-        output_result_per_variable: list[list[float]] = [[], [], [], [], [], [], [], []]
+        output_result_per_variable: list[list[float]] = [[], [], [], [], [], [], [], [], []]
         w_s = [w_s_op] * n_eval
         w_f = [w_f_op] * n_eval
 
@@ -70,7 +70,8 @@ def find_states_and_outputs_bound(
             w_b = w_b_vec[-1]
             i_q = indices[0][-1]
             i_w_in = indices[1][-1]
-            i_h_in = indices[2][-1]
+            i_s_in = indices[2][-1]
+            i_h_in = indices[3][-1]
 
             iteration_result = [
                 l,
@@ -80,6 +81,7 @@ def find_states_and_outputs_bound(
                 w_b,
                 i_q,
                 i_w_in,
+                i_s_in,
                 i_h_in,
             ]
 

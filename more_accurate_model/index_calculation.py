@@ -4,8 +4,9 @@ import thermo as th
 def calculate_all_indices(sol, u, d, params):
     i_q = calculate_heat_index(u)
     i_w_in = calculate_inlet_flow_index(u, d)
+    i_s_in = calculate_salt_inlet_index(u, d, params)
     i_h_in = calculate_inlet_enthalpy_index(u, d, params)
-    indices_vec = [i_q, i_w_in, i_h_in]
+    indices_vec = [i_q, i_w_in, i_s_in, i_h_in]
     label_vec = ["heat Index", "inlet flow index", "inlet salt index", "inlet enthalpy index"]
     unit_vec = ["kj/h", "kj/h", "kj/h", "kg/h", "", "kg","kj/kg"]
     return (indices_vec, label_vec, unit_vec)
@@ -22,6 +23,17 @@ def calculate_inlet_flow_index(u, d):
     _, w_bin_vec = d 
     I_w_in = [w_f + w_bin for w_f, w_bin in zip(w_f_vec, w_bin_vec)]
     return I_w_in
+
+def calculate_salt_inlet_index(u, d, params):
+    _, w_f_vec = u
+    _, w_bin_vec= d 
+    x_f_vec = params.seawater_salinity
+    x_bin_vec = params.previous_brine_salinity
+    w_f_x_f = [w_f * x_f for w_f, x_f in zip(w_f_vec, x_f_vec)]
+    w_b_x_b = [w_b * x_b for w_b, x_b in zip(w_bin_vec, x_bin_vec)]
+    I_s_in = [feed + brine for feed, brine in zip(w_f_x_f, w_b_x_b)]
+    return I_s_in
+
 
 def calculate_inlet_enthalpy_index(u, d, params):
     _, w_f_vec = u
