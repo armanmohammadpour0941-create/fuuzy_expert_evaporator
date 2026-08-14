@@ -7,17 +7,17 @@ rule_table = [
     ["NS", "Z", "PS", "PL", "PL"],
     ["Z", "PS", "PL", "PL", "PL"],
 ]
-# dl/dt
+# dx/dt
 input1_range = [0, -10, 10]
-# L(k-1)
-input2_range = [0.11, 0, 0.22]
-# L(k)
-output_range = [0.11, 0, 0.22]
+# x(k-1)
+input2_range = [6, 5, 7]
+# x(k)
+output_range = [6, 5, 7]
 
-input1_crisp_value = 1.5
-input2_crisp_value = 0.09
+input1_crisp_value = 7.5
+input2_crisp_value = 5.1
 
-l = ra.calculate_fuzzy_block_output(
+x = ra.calculate_fuzzy_block_output(
     input1_crisp_value,
     input2_crisp_value,
     input1_range,
@@ -25,5 +25,5 @@ l = ra.calculate_fuzzy_block_output(
     output_range,
     rule_table,
 )
-print(l)
+print(x)
 

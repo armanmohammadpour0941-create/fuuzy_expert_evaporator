@@ -8,8 +8,11 @@ rule_table = [
     ["PL", "PL", "PL", "PS", "Z"],
 ]
 
+# I_w_in
 input1_range = [70, 60, 80]
+# I_w_out
 input2_range = [70, 60, 80]
+#dl/dt
 output_range = [0, -5, 5]
 
 input1_crisp_value = 74.5
