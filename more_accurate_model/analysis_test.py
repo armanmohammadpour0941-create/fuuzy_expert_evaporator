@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 
-import analysis
 import numpy as np
+
+from more_accurate_model import analysis
 
 
 @dataclass

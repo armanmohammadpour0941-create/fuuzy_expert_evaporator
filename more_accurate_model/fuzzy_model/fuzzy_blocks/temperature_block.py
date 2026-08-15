@@ -25,7 +25,7 @@ def temperature_derivative(e_h, l):
     # level
     input2_range = [0.11, 0, 0.22]
     # dT/dt
-    output_range = [0, -10, 10]
+    output_range = [0, -100, 100]
 
     input1_crisp_value = e_h
     input2_crisp_value = l

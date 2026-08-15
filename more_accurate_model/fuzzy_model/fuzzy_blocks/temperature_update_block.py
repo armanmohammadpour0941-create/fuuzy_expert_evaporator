@@ -20,11 +20,11 @@ def temperature_update(dT_dt, last_T):
         ["Z", "PS", "PL", "PL", "PL"],
     ]
     # dT/dt
-    input1_range = [0, -10, 10]
+    input1_range = [0, -100, 100]
     # T(k-1)
-    input2_range = [50, 40, 60]
+    input2_range = [50, 10, 90]
     # T(k)
-    output_range = [50, 40, 60]
+    output_range = [50, 10, 90]
 
     input1_crisp_value = dT_dt
     input2_crisp_value = last_T

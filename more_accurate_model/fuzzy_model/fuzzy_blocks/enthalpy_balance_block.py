@@ -21,9 +21,9 @@ def enthalpy_balance(e_h_in, e_h_out):
     ]
 
     # E_h_in
-    input1_range = [60670.99, 30000, 90000]
+    input1_range = [60670.99, 0, 120000]
     # E_h_out
-    input2_range = [59624.67, 53000, 66300]
+    input2_range = [59624.67, 0, 119250]
     #E_h
     output_range = [0, -1000, 1000]
 

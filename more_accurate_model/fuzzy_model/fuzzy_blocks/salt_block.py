@@ -25,7 +25,7 @@ def salt_derivative(e_s, l):
     # level
     input2_range = [0.11, 0, 0.22]
     # dx/dt
-    output_range = [0, -10, 10]
+    output_range = [0, -100, 100]
 
     input1_crisp_value = e_s
     input2_crisp_value = l

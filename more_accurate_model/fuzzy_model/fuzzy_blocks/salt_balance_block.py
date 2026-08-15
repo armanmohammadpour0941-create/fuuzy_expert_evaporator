@@ -23,7 +23,7 @@ def salt_balance(i_s_in, w_b, x):
     # I_sin
     input1_range = [340, 300, 380]
     # I_sout
-    input2_range = [340, 300, 380]
+    input2_range = [340, 40, 640]
     # E_s
     output_range = [0, -100, 100]
     
@@ -40,4 +40,3 @@ def salt_balance(i_s_in, w_b, x):
         rule_table,
     )
     return E_s
-

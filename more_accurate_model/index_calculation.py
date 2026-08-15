@@ -1,5 +1,5 @@
-import solution as sl
-import thermo as th
+from more_accurate_model import solution as sl
+from more_accurate_model import thermo as th
 
 
 def calculate_all_indices(sol, u, d, params):

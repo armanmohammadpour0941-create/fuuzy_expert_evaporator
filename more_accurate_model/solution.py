@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import thermo as th
+
+from more_accurate_model import thermo as th
 
 
 def calculate_vapor_flow_from_sol(sol, u, d, params):

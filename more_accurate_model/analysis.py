@@ -1,8 +1,8 @@
 import csv
 
-import index_calculation as ic
-import solution as sl
-import solver
+from more_accurate_model import index_calculation as ic
+from more_accurate_model import solution as sl
+from more_accurate_model import solver
 
 
 def find_states_and_outputs_bound(

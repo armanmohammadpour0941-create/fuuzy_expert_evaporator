@@ -1,5 +1,6 @@
-from equation import med_equation
 from scipy.integrate import solve_ivp
+
+from more_accurate_model.equation import med_equation
 
 
 def evaporator_ode_solver(t_span, t_eval, X0, u, distur, time_vec, params):

@@ -1,5 +1,6 @@
 import numpy as np
-import thermo as th
+
+from more_accurate_model import thermo as th
 
 
 def med_equation(t, x, u, distur, params, time_vec):

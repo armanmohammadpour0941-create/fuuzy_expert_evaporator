@@ -20,7 +20,7 @@ def level_update(dl_dt, last_l):
         ["Z", "PS", "PL", "PL", "PL"],
     ]
     # dl/dt
-    input1_range = [0, -10, 10]
+    input1_range = [0, -100, 100]
     # L(k-1)
     input2_range = [0.11, 0, 0.22]
     # L(k)

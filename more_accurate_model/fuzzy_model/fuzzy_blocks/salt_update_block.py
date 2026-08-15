@@ -20,11 +20,11 @@ def salt_updte(dx_dt, last_x):
         ["Z", "PS", "PL", "PL", "PL"],
     ]
     # dx/dt
-    input1_range = [0, -10, 10]
+    input1_range = [0, -100, 100]
     # x(k-1)
-    input2_range = [6, 5, 7]
+    input2_range = [6, 0, 12]
     # x(k)
-    output_range = [6, 5, 7]
+    output_range = [6, 0, 12]
 
     input1_crisp_value = dx_dt
     input2_crisp_value = last_x

@@ -34,7 +34,7 @@ from more_accurate_model.fuzzy_model.fuzzy_blocks.library import FuzzyStepResult
 @dataclass
 class FuzzySolution:
     
-    time: np.ndarray
+    t: np.ndarray
     y: np.ndarray
     w_v: np.ndarray
     w_b: np.ndarray

@@ -62,7 +62,7 @@ def calculate_fuzzy_block_output(
     output_pl = np.fmin(max(P_l), pl)
 
     aggregated = np.fmax(output_nl, np.fmax(output_ns, np.fmax(output_z, np.fmax(output_ps, output_pl))))
-    output_normal = fuzz.defuzz(variable_range, aggregated, "centroid")
+    output_normal = fuzz.defuzz(variable_range, aggregated, 'mom')
     denormal_output = norm.denormalize_scale(output_normal, output_range)
     
     dl0 = np.zeros_like(variable_range)
@@ -88,5 +88,5 @@ def calculate_fuzzy_block_output(
         ax.get_yaxis().tick_left()
 
     plt.tight_layout()
-    plt.show()
+    # plt.show()
     return denormal_output

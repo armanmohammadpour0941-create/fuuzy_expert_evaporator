@@ -1,30 +1,24 @@
-from dataclasses import dataclass
+import sys
+from pathlib import Path
+
+# Find the 'fuuzy_expert_evaporator' root folder automatically
+FILE_PATH = Path(__file__).resolve()
+ROOT_DIR = next(p for p in FILE_PATH.parents if p.name == "fuuzy_expert_evaporator")
+
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
 
 import numpy as np
 
-from more_accurate_model import index_calculation as ic
 from more_accurate_model import solution as sl
-from more_accurate_model import solver
+from more_accurate_model.fuzzy_model import fuzzy_solver
+from more_accurate_model.problem import Params
 
-
-@dataclass
-class Params:
-    t_sin: float  # steam input temperature(deg C)
-    A_s: float  # cross area of effect (m2)
-    A_o: float  # cross area of brine outlet pipe(m2)
-    A_e: float  # heat transfer area(m2)
-    H: float  # hight of effect(m)
-    boiling_temp: float  # boiling temperature at the effect pressure (deg C)
-    seawater_salinity: list[float]
-    previous_brine_salinity: list[float]
-    previous_brine_temp: list[float]
-
-
-t_span = (0, 5000)
-t_eval = np.linspace(0, 5000, 5000)
+t_span = (0, 500)
+t_eval = np.linspace(0, 500, 500)
 n_eval = len(t_eval)
 
-x0 = [0.01, 0.5, 30.0]
+x0 = [0.05, 5.5, 45.0]
 w_s = [20] * n_eval
 w_f = [40] * n_eval
 
@@ -71,15 +65,6 @@ d = [
     w_bin,  # W_bin - brine inlet flow (kg/s)
 ]
 
-sol = solver.evaporator_ode_solver(t_span, t_eval, x0, u, d, t_eval, params)
-w_v = sl.calculate_vapor_flow_from_sol(sol, u, d, params)
-w_b = sl.calculate_liquid_flow_from_sol(sol, params)
-
-
-# sl.plot_solver_result(sol)
-
-# calculation Indices
-(indices, label, unit) = ic.calculate_all_indices(sol, u, d, params)
-sl.print_final_value(sol, w_v, w_b, indices)
-# sl.plot_complete_solution(sol, w_v, w_b)
-# sl.plot_indices(sol, indices, label, unit)
+solution = fuzzy_solver.fuzzy_solver(t_eval, x0, u, d, params)
+sl.plot_time_vector(solution, solution.w_v, "vapor_flow", "kg/h")
+sl.plot_time_vector(solution, solution.w_b, "liquid_flow", "kg/h")

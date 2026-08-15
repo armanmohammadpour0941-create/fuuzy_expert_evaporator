@@ -22,9 +22,9 @@ def outlet_energy(w_v, w_b, temperature):
     # w_v
     input1_range_w_v = [10, 5, 15]
     # T
-    input2_range_w_v = [50, 40, 60]
+    input2_range_w_v = [50, 10, 90]
     # E_w_v
-    output_range_w_v = [29184.44, 27000, 31370]
+    output_range_w_v = [29184.44, 0, 58370]
 
     input1_crisp_value_w_v = w_v
     input2_crisp_value_w_v = temperature
@@ -47,11 +47,11 @@ def outlet_energy(w_v, w_b, temperature):
         ["PS", "PS", "PL", "PL", "PL"],
     ]
     # w_b
-    input1_range_w_b = [60, 55, 65]
+    input1_range_w_b = [60, 0, 120]
     # T
-    input2_range_w_b = [50, 40, 60]
+    input2_range_w_b = [50, 10, 90]
     # E_w_b
-    output_range_w_b = [30440.22, 25800, 35000]
+    output_range_w_b = [30440.22, 0, 60880]
 
     input1_crisp_value_w_b = w_b
     input2_crisp_value_w_b = temperature
@@ -74,11 +74,11 @@ def outlet_energy(w_v, w_b, temperature):
         ["PS", "PS", "PL", "PL", "PL"],
     ]
     # E_w_v
-    input1_range_h_out = [29184.44, 27000, 31370]
+    input1_range_h_out = [29184.44, 0, 58370]
     # E_w_b
-    input2_range_h_out = [30440.22, 25800, 35000]
+    input2_range_h_out = [30440.22, 0, 60880]
     # E_h_out
-    output_range_h_out = [59624.67, 53000, 66300]
+    output_range_h_out = [59624.67, 0, 119250]
 
     input1_crisp_value_h_out = e_w_v
     input2_crisp_value_h_out = e_w_b

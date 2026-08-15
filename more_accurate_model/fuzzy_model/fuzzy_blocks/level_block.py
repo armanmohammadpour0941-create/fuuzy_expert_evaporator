@@ -38,4 +38,5 @@ def level_derivative(i_w_in, w_v, w_b):
         output_range,
         rule_table,
     )
-    print(dl_dt)
+    return dl_dt
+print(level_derivative(70, 10.75, 59.25))
