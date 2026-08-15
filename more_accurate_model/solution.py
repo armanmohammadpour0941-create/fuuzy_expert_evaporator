@@ -215,9 +215,9 @@ def plot_indices(
     plt.show()
 
 
-def plot_time_vector(sol, vector, vector_name: str, unit: str):
+def plot_time_vector(time_vec, vector, vector_name: str, unit: str):
 
-    plt.plot(sol.t, vector, label=vector_name)
+    plt.plot(time_vec, vector, label=vector_name)
     plt.xlabel("time (s)")
     plt.ylabel(unit)
     plt.grid()

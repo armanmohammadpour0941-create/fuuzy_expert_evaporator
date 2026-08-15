@@ -66,5 +66,9 @@ d = [
 ]
 
 solution = fuzzy_solver.fuzzy_solver(t_eval, x0, u, d, params)
-sl.plot_time_vector(solution, solution.w_v, "vapor_flow", "kg/h")
-sl.plot_time_vector(solution, solution.w_b, "liquid_flow", "kg/h")
+sl.plot_time_vector(solution.t, solution.w_v, "vapor_flow", "kg/h")
+sl.plot_time_vector(solution.t, solution.w_b, "liquid_flow", "kg/h")
+sl.plot_time_vector(t_eval, solution.y[0,:], "level", "m")
+sl.plot_time_vector(t_eval, solution.y[1,:], "salinity", "% kg")
+sl.plot_time_vector(t_eval, solution.y[2,:], "temperature", "deg C")
+

@@ -39,4 +39,3 @@ def level_derivative(i_w_in, w_v, w_b):
         rule_table,
     )
     return dl_dt
-print(level_derivative(70, 10.75, 59.25))

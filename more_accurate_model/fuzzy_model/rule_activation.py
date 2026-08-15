@@ -1,4 +1,4 @@
-import matplotlib.pyplot as plt
+
 import numpy as np
 import skfuzzy as fuzz
 
@@ -65,28 +65,27 @@ def calculate_fuzzy_block_output(
     output_normal = fuzz.defuzz(variable_range, aggregated, 'mom')
     denormal_output = norm.denormalize_scale(output_normal, output_range)
     
-    dl0 = np.zeros_like(variable_range)
-    fig, ax0 = plt.subplots(figsize=(8, 3))  # noqa: RUF059
+    # dl0 = np.zeros_like(variable_range)
+    # fig, ax0 = plt.subplots(figsize=(8, 3)) 
+    # ax0.fill_between(variable_range, dl0, output_nl, facecolor='b', alpha=0.7)
+    # ax0.plot(variable_range, nl, 'b', linewidth=0.5, linestyle='--', )
+    # ax0.fill_between(variable_range, dl0, output_ns, facecolor='g', alpha=0.7)
+    # ax0.plot(variable_range, ns, 'g', linewidth=0.5, linestyle='--')
+    # ax0.fill_between(variable_range, dl0, output_z, facecolor='r', alpha=0.7)
+    # ax0.plot(variable_range, z, 'r', linewidth=0.5, linestyle='--')
+    # ax0.fill_between(variable_range, dl0, output_ps, facecolor='g', alpha=0.7)
+    # ax0.plot(variable_range, ps, 'g', linewidth=0.5, linestyle='--')
+    # ax0.fill_between(variable_range, dl0, output_pl, facecolor='r', alpha=0.7)
+    # ax0.plot(variable_range, pl, 'r', linewidth=0.5, linestyle='--')
+    # ax0.set_title('Output membership activity')
 
-    ax0.fill_between(variable_range, dl0, output_nl, facecolor='b', alpha=0.7)
-    ax0.plot(variable_range, nl, 'b', linewidth=0.5, linestyle='--', )
-    ax0.fill_between(variable_range, dl0, output_ns, facecolor='g', alpha=0.7)
-    ax0.plot(variable_range, ns, 'g', linewidth=0.5, linestyle='--')
-    ax0.fill_between(variable_range, dl0, output_z, facecolor='r', alpha=0.7)
-    ax0.plot(variable_range, z, 'r', linewidth=0.5, linestyle='--')
-    ax0.fill_between(variable_range, dl0, output_ps, facecolor='g', alpha=0.7)
-    ax0.plot(variable_range, ps, 'g', linewidth=0.5, linestyle='--')
-    ax0.fill_between(variable_range, dl0, output_pl, facecolor='r', alpha=0.7)
-    ax0.plot(variable_range, pl, 'r', linewidth=0.5, linestyle='--')
-    ax0.set_title('Output membership activity')
+    # # Turn off top/right axes
+    # for ax in (ax0,):
+    #     ax.spines['top'].set_visible(False)
+    #     ax.spines['right'].set_visible(False)
+    #     ax.get_xaxis().tick_bottom()
+    #     ax.get_yaxis().tick_left()
 
-    # Turn off top/right axes
-    for ax in (ax0,):
-        ax.spines['top'].set_visible(False)
-        ax.spines['right'].set_visible(False)
-        ax.get_xaxis().tick_bottom()
-        ax.get_yaxis().tick_left()
-
-    plt.tight_layout()
-    # plt.show()
+    # plt.tight_layout()
+    # # plt.show()
     return denormal_output

@@ -54,6 +54,7 @@ def fuzzy_solver(time_vec, x0, u, d, params):
     t_sin = params.t_sin
     t_boil = params.boiling_temp
     A_o = params.A_o
+    time = []
     w_v_out = []
     w_b_out = []   
     diagnostics = []
@@ -114,11 +115,12 @@ def fuzzy_solver(time_vec, x0, u, d, params):
             t_v_next
         )
         diagnostics.append(step_result)
+        time.append(sample)
         w_v_out.append(w_v)
         w_b_out.append(w_b)
         
     solution = FuzzySolution(
-        time_vec,
+        time,
         states,
         w_v_out,
         w_b_out,
