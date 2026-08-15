@@ -1,29 +1,31 @@
 import rule_activation as ra
 
-rule_table = [
-    ["Z", "PS", "NL", "NS", "NL"],
-    ["PS", "Z", "NS", "NS", "NL"],
-    ["PL", "PS", "Z", "NS", "NL"],
-    ["PL", "PL", "PS", "Z", "NS"],
-    ["PL", "PL", "PL", "PS", "Z"],
-]
 
-# I_w_in
-input1_range = [70, 60, 80]
-# I_w_out
-input2_range = [70, 60, 80]
-#dl/dt
-output_range = [0, -5, 5]
+def level_derivative(i_w_in, w_v, w_b):
+    rule_table = [
+        ["Z", "PS", "NL", "NS", "NL"],
+        ["PS", "Z", "NS", "NS", "NL"],
+        ["PL", "PS", "Z", "NS", "NL"],
+        ["PL", "PL", "PS", "Z", "NS"],
+        ["PL", "PL", "PL", "PS", "Z"],
+    ]
 
-input1_crisp_value = 74.5
-input2_crisp_value = 68.7
+    # I_w_in
+    input1_range = [70, 60, 80]
+    # I_w_out
+    input2_range = [70, 60, 80]
+    #dl/dt
+    output_range = [0, -5, 5]
 
-dl_dt = ra.calculate_fuzzy_block_output(
-    input1_crisp_value,
-    input2_crisp_value,
-    input1_range,
-    input2_range,
-    output_range,
-    rule_table,
-)
-print(dl_dt)
+    input1_crisp_value = i_w_in
+    input2_crisp_value = w_v + w_b
+
+    dl_dt = ra.calculate_fuzzy_block_output(
+        input1_crisp_value,
+        input2_crisp_value,
+        input1_range,
+        input2_range,
+        output_range,
+        rule_table,
+    )
+    print(dl_dt)
