@@ -1,4 +1,14 @@
-import rule_activation as ra
+import sys
+from pathlib import Path
+
+# Find the 'fuuzy_expert_evaporator' root folder automatically
+FILE_PATH = Path(__file__).resolve()
+ROOT_DIR = next(p for p in FILE_PATH.parents if p.name == "fuuzy_expert_evaporator")
+
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+    
+from more_accurate_model.fuzzy_model import rule_activation as ra
 
 
 def level_update(dl_dt, last_l):

@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
-import normaliziation as norm
 import numpy as np
 import skfuzzy as fuzz
+
+from more_accurate_model.fuzzy_model import normaliziation as norm
 
 
 def calculate_fuzzy_block_output(
