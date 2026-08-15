@@ -36,6 +36,7 @@ def level_update(dl_dt, last_l):
         input2_range,
         output_range,
         rule_table,
+        'som'
     )
     return l
 

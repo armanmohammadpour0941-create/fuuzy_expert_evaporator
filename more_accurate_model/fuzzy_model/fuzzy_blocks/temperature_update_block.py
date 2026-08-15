@@ -36,5 +36,6 @@ def temperature_update(dT_dt, last_T):
         input2_range,
         output_range,
         rule_table,
+        'som'
     )
     return t

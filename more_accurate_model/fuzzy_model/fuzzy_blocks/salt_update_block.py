@@ -36,6 +36,7 @@ def salt_updte(dx_dt, last_x):
         input2_range,
         output_range,
         rule_table,
+        'som'
     )
     return x
 

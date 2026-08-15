@@ -36,6 +36,7 @@ def outlet_energy(w_v, w_b, temperature):
         input2_range_w_v,
         output_range_w_v,
         rule_table_w_v,
+        'som'
     )
 
     # E_w_b
@@ -63,6 +64,7 @@ def outlet_energy(w_v, w_b, temperature):
         input2_range_w_b,
         output_range_w_b,
         rule_table_w_b,
+        'som'
     )
     
     # E_h_out   
@@ -90,5 +92,6 @@ def outlet_energy(w_v, w_b, temperature):
         input2_range_h_out,
         output_range_h_out,
         rule_table_h_out,
+        'som'
     )
     return e_h_out

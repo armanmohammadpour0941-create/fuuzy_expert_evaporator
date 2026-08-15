@@ -37,6 +37,7 @@ def salt_derivative(e_s, l):
         input2_range,
         output_range,
         rule_table,
+        'som'
     )
     return dx_dt
 

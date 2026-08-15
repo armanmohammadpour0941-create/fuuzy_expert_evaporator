@@ -11,7 +11,8 @@ def calculate_fuzzy_block_output(
     input1_range: list[float, float, float],
     input2_range: list[float, float, float],
     output_range: list[float, float, float],
-    rule_table: list[list[str]]
+    rule_table: list[list[str]],
+    mod: str
 ):
     variable_range = np.arange(-5, 5.5, 0.5)
 
@@ -62,7 +63,7 @@ def calculate_fuzzy_block_output(
     output_pl = np.fmin(max(P_l), pl)
 
     aggregated = np.fmax(output_nl, np.fmax(output_ns, np.fmax(output_z, np.fmax(output_ps, output_pl))))
-    output_normal = fuzz.defuzz(variable_range, aggregated, 'mom')
+    output_normal = fuzz.defuzz(variable_range, aggregated, mod)
     denormal_output = norm.denormalize_scale(output_normal, output_range)
     
     # dl0 = np.zeros_like(variable_range)

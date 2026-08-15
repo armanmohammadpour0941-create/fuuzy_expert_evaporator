@@ -38,5 +38,6 @@ def salt_balance(i_s_in, w_b, x):
         input2_range,
         output_range,
         rule_table,
+        'som'
     )
     return E_s

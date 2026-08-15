@@ -37,6 +37,7 @@ def temperature_derivative(e_h, l):
         input2_range,
         output_range,
         rule_table,
+        'som'
     )
     return dT_dt
 

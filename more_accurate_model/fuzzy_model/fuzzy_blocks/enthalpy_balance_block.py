@@ -36,5 +36,6 @@ def enthalpy_balance(e_h_in, e_h_out):
         input2_range,
         output_range,
         rule_table,
+        'som'
     )
     return e_h
