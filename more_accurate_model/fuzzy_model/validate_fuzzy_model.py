@@ -19,7 +19,7 @@ from more_accurate_model.solution import (
 from more_accurate_model.solver import evaporator_ode_solver
 
 
-def build_case():
+def build_case(step_change: float, variable_name: str):
     count = 1000
     time = np.linspace(0.0, 1000.0, count)
     steam = np.full(count, 20.0)
@@ -33,15 +33,28 @@ def build_case():
         A_e=2000.0,
         H=4.0,
         boiling_temp=50.0,
-        seawater_salinity=np.full(count, 4.0),
-        previous_brine_salinity=np.full(count, 6.0),
-        previous_brine_temp=np.full(count, 60.0),
+        seawater_salinity=4.0,
+        previous_brine_salinity=6.0,
+        previous_brine_temp= 60.0,
     )
-    return time, [steam, feed], [feed_temperature, previous_brine], params
+    for sample in range(count // 2, count):
+        if variable_name == "w_s":
+            steam[sample] = 20 * (1 + step_change)
+        elif variable_name == "w_f":
+            feed[sample] = 40 * (1 + step_change)
+        elif variable_name == "w_bin":
+            previous_brine[sample] = 30 * (1 + step_change)
+        elif variable_name == "t_f":
+            feed_temperature[sample] = 20 * (1 + step_change)
+        else:
+            print("variable name is not match")
+            break
+        
+    return time, [steam, feed, previous_brine], [feed_temperature], params
 
 
 def main():
-    time, inputs, disturbances, params = build_case()
+    time, inputs, disturbances, params = build_case(0.1, "w_f")
     initial_state = [0.05, 5.5, 45.0]
 
     fuzzy = fuzzy_solver(time, initial_state, inputs, disturbances, params)

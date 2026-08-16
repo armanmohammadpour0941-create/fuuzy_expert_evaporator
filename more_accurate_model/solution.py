@@ -5,12 +5,12 @@ from more_accurate_model import thermo as th
 
 
 def calculate_vapor_flow_from_sol(sol, u, d, params):
-    w_s_vec, w_f_vec = u
-    t_f_vec, w_bin_vec = d
+    w_s_vec, w_f_vec, w_bin_vec = u
+    t_f_vec = d[0]
     
-    x_f_vec = params.seawater_salinity
-    x_bin_vec = params.previous_brine_salinity
-    t_bin_vec = params.previous_brine_temp
+    x_f = params.seawater_salinity
+    x_bin = params.previous_brine_salinity
+    t_bin = params.previous_brine_temp
     
     t_v_vec = sol.y[2]
     x_vec = sol.y[1]
@@ -40,10 +40,8 @@ def calculate_vapor_flow_from_sol(sol, u, d, params):
         w_s = w_s_vec[i]
         w_f = w_f_vec[i]
         t_f = t_f_vec[i]
-        x_f = x_f_vec[i]
+        
         w_bin = w_bin_vec[i]
-        x_bin = x_bin_vec[i]
-        t_bin = t_bin_vec[i]
 
         t_v = t_v_vec[i]
         x = x_vec[i]

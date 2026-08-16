@@ -17,16 +17,17 @@ def find_states_and_outputs_bound(
     n_eval = len(t_eval)
     w_s_range = u_range[0]
     w_f_range = u_range[1]
-
+    w_bin_range = u_range[2]
+    
     t_f_range = d_range[0]
-    w_bin_range = d_range[1]
+    
 
     w_s_op = w_s_range.pop(1)
     w_f_op = w_f_range.pop(1)
-
-    t_f_op = t_f_range.pop(1)
     w_bin_op = w_bin_range.pop(1)
-
+    
+    t_f_op = t_f_range.pop(1)
+    
     input_and_distur_vec = [
         ("w_s", w_s_range),
         ("w_f", w_f_range),
@@ -54,8 +55,8 @@ def find_states_and_outputs_bound(
             else:
                 raise ValueError("the name not match")
 
-            u = [w_s, w_f]
-            d = [t_f, w_bin]
+            u = [w_s, w_f, w_bin]
+            d = [t_f]
             sol = solver.evaporator_ode_solver(
                 t_span, t_eval, x0, u, d, time_vec, params
             )
