@@ -42,6 +42,12 @@ class FuzzySolution:
     
     
 def fuzzy_solver(time_vec, x0, u, d, params):
+    time_vec = np.asarray(time_vec, dtype=float)
+    if time_vec.ndim != 1 or len(time_vec) < 2:
+        raise ValueError("time_vec must be a one-dimensional vector with at least 2 points.")
+    if np.any(np.diff(time_vec) <= 0.0):
+        raise ValueError("time_vec must be strictly increasing.")
+
     n_eval = len(time_vec)
     states = np.empty((3, n_eval), dtype=float)
     
@@ -54,13 +60,13 @@ def fuzzy_solver(time_vec, x0, u, d, params):
     t_sin = params.t_sin
     t_boil = params.boiling_temp
     A_o = params.A_o
-    time = []
     w_v_out = []
     w_b_out = []   
     diagnostics = []
     
     states[:, 0] = np.asarray(x0, dtype=float)
     for sample in range(n_eval - 1):
+        dt = time_vec[sample + 1] - time_vec[sample]
         l = states[:, sample][0]
         x = states[:, sample][1]
         t_v = states[:, sample][2]
@@ -85,18 +91,18 @@ def fuzzy_solver(time_vec, x0, u, d, params):
         I_h_in = indices.calculate_inlet_flow_enthalpy_index(w_f, w_bin, t_f, t_bin)
         
         dl_dt = level_block.level_derivative(I_w_in, w_v, w_b)
-        l_next = level_update_block.level_update(dl_dt, l)
+        l_next = level_update_block.level_update(dl_dt, l, dt)
         
         E_s = salt_balance_block.salt_balance(I_s_in, w_b, x)
         dx_dt = salt_block.salt_derivative(E_s, l_next)
-        x_next = salt_update_block.salt_updte(dx_dt, x)
+        x_next = salt_update_block.salt_update(dx_dt, x, dt)
         
         E_h_in = I_q + I_h_in
         E_h_out = outlet_enthalpy_block.outlet_energy(w_v, w_b, t_v)
         E_h = enthalpy_balance_block.enthalpy_balance(E_h_in, E_h_out)
         
         dT_dt = temperature_block.temperature_derivative(E_h, l_next)
-        t_v_next = temperature_update_block.temperature_update(dT_dt, t_v)
+        t_v_next = temperature_update_block.temperature_update(dT_dt, t_v, dt)
         next_state = [l_next, x_next, t_v_next]
         states[:, sample + 1] = np.asarray(next_state, dtype=float)
         step_result = FuzzyStepResult(
@@ -115,15 +121,34 @@ def fuzzy_solver(time_vec, x0, u, d, params):
             t_v_next
         )
         diagnostics.append(step_result)
-        time.append(sample)
         w_v_out.append(w_v)
         w_b_out.append(w_b)
+
+    # Evaluate algebraic outputs at the final state as well so every returned
+    # trajectory has the same length as time_vec.
+    l, x, t_v = states[:, -1]
+    w_v_out.append(
+        vapor_flow.calculate_vapor_flow_rate(
+            x,
+            x_f_vec[-1],
+            x_bin_vec[-1],
+            t_v,
+            t_f_vec[-1],
+            t_bin_vec[-1],
+            t_sin,
+            t_boil,
+            w_s_vec[-1],
+            w_f_vec[-1],
+            w_bin_vec[-1],
+        )
+    )
+    w_b_out.append(liquid_flow.calculate_liquid_flow_rate(l, x, t_v, A_o))
         
     solution = FuzzySolution(
-        time,
+        time_vec,
         states,
-        w_v_out,
-        w_b_out,
+        np.asarray(w_v_out, dtype=float),
+        np.asarray(w_b_out, dtype=float),
         diagnostics
     )
     return solution

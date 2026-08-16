@@ -1,10 +1,10 @@
+"""Runnable example for the fuzzy evaporator model."""
+
 import sys
 from pathlib import Path
 
-# Find the 'fuuzy_expert_evaporator' root folder automatically
 FILE_PATH = Path(__file__).resolve()
 ROOT_DIR = next(p for p in FILE_PATH.parents if p.name == "fuuzy_expert_evaporator")
-
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
@@ -14,61 +14,65 @@ from more_accurate_model import solution as sl
 from more_accurate_model.fuzzy_model import fuzzy_solver
 from more_accurate_model.problem import Params
 
-t_span = (0, 500)
-t_eval = np.linspace(0, 500, 500)
-n_eval = len(t_eval)
 
-x0 = [0.05, 5.5, 45.0]
-w_s = [20] * n_eval
-w_f = [40] * n_eval
+def main(show_plots=True):
+    t_eval = np.linspace(0.0, 1000.0, 1000)
+    n_eval = len(t_eval)
 
-t_f = [20] * n_eval
-x_f = [4] * n_eval
-w_bin = [30] * n_eval
-x_bin = [6] * n_eval
-t_bin = [60] * n_eval
+    x0 = [0.05, 5.5, 45.0]
+    w_s = [20.0] * n_eval
+    w_f = [40.0] * n_eval
+    t_f = [20.0] * n_eval
+    x_f = [4.0] * n_eval
+    w_bin = [30.0] * n_eval
+    x_bin = [6.0] * n_eval
+    t_bin = [60.0] * n_eval
 
-params = Params(
-    t_sin=55.0,
-    A_s=8.64,
-    A_o=0.025,
-    A_e=2000.0,
-    H=4.0,
-    boiling_temp=50.0,
-    seawater_salinity=x_f,  # x_f - feed salinity (wt% or fraction)
-    previous_brine_salinity=x_bin,  # x_bin - brine inlet salinity (fraction)
-    previous_brine_temp=t_bin,  # T_bin - brine inlet temperature (°C)]
-)
+    params = Params(
+        t_sin=55.0,
+        A_s=8.64,
+        A_o=0.025,
+        A_e=2000.0,
+        H=4.0,
+        boiling_temp=50.0,
+        seawater_salinity=x_f,
+        previous_brine_salinity=x_bin,
+        previous_brine_temp=t_bin,
+    )
 
-for i in range(int(n_eval / 2), n_eval):
-    change_precentage = 0.2
+    # Uncomment an assignment to create a 20% step at t = 250 s.
+    for sample in range(n_eval // 2, n_eval):
+        change_percentage = 0.10
+        # w_s[sample] = 20.0 * (1.0 + change_percentage)
+        # w_f[sample] = 40.0 * (1.0 + change_percentage)
+        # t_f[sample] = 20.0 * (1.0 + change_percentage)
+        # w_bin[sample] = 30.0 * (1.0 + change_percentage)
+        _ = change_percentage
 
-    # w_s[i] = 20 * (1 + change_precentage)
-    # w_f[i] = 40 * (1 + change_precentage)
+    result = fuzzy_solver.fuzzy_solver(
+        t_eval,
+        x0,
+        [w_s, w_f],
+        [t_f, w_bin],
+        params,
+    )
 
-    # input negative change
-    # w_s[i] = 20 * (1 - change_precentage)
-    # w_f[i] = 80 * (1 - change_precentage)
+    print(
+        f"Final level: {result.y[0, -1]:.4f} m\n"
+        f"Final salinity: {result.y[1, -1]:.4f} wt%\n"
+        f"Final temperature: {result.y[2, -1]:.4f} deg C\n"
+        f"Final vapor flow: {result.w_v[-1]:.4f} kg/s\n"
+        f"Final brine flow: {result.w_b[-1]:.4f} kg/s"
+    )
 
-    # disturbance positive change
-    # t_f[i] = 20 * (1 + change_precentage)
-    # w_bin[i] = 50 * (1 + change_precentage)
+    if show_plots:
+        sl.plot_time_vector(result.t, result.w_v, "vapor flow", "kg/s")
+        sl.plot_time_vector(result.t, result.w_b, "liquid flow", "kg/s")
+        sl.plot_time_vector(result.t, result.y[0], "level", "m")
+        sl.plot_time_vector(result.t, result.y[1], "salinity", "wt%")
+        sl.plot_time_vector(result.t, result.y[2], "temperature", "deg C")
+    return result
 
-    # disturbance negative change
-    # t_f[i] = 20 * (1 - change_precentage)
-    # w_bin[i] = 50 * (1 - change_precentage)
 
-
-u = [w_s, w_f]
-d = [
-    t_f,  # T_f - feed temperature (°C)
-    w_bin,  # W_bin - brine inlet flow (kg/s)
-]
-
-solution = fuzzy_solver.fuzzy_solver(t_eval, x0, u, d, params)
-sl.plot_time_vector(solution.t, solution.w_v, "vapor_flow", "kg/h")
-sl.plot_time_vector(solution.t, solution.w_b, "liquid_flow", "kg/h")
-sl.plot_time_vector(t_eval, solution.y[0,:], "level", "m")
-sl.plot_time_vector(t_eval, solution.y[1,:], "salinity", "% kg")
-sl.plot_time_vector(t_eval, solution.y[2,:], "temperature", "deg C")
-
+if __name__ == "__main__":
+    main()
