@@ -50,9 +50,26 @@ def fuzzy_solver(time_vec, x0, u, d, params):
 
     n_eval = len(time_vec)
     states = np.empty((3, n_eval), dtype=float)
-    
-    w_s_vec, w_f_vec, w_bin_vec = u
-    t_f_vec = d[0]
+
+    if len(u) != 3:
+        raise ValueError("u must contain [w_s, w_f, w_bin].")
+    if len(d) != 1:
+        raise ValueError("d must contain [t_f].")
+
+    def trajectory(name, values):
+        values = np.asarray(values, dtype=float)
+        if values.shape != (n_eval,):
+            raise ValueError(f"{name} must have the same length as time_vec.")
+        if not np.all(np.isfinite(values)):
+            raise ValueError(f"{name} must contain only finite values.")
+        return values
+
+    w_s_vec, w_f_vec, w_bin_vec = (
+        trajectory("w_s", u[0]),
+        trajectory("w_f", u[1]),
+        trajectory("w_bin", u[2]),
+    )
+    t_f_vec = trajectory("t_f", d[0])
 
     x_f = params.seawater_salinity
     x_bin = params.previous_brine_salinity
@@ -64,7 +81,10 @@ def fuzzy_solver(time_vec, x0, u, d, params):
     w_b_out = []   
     diagnostics = []
     
-    states[:, 0] = np.asarray(x0, dtype=float)
+    initial_state = np.asarray(x0, dtype=float)
+    if initial_state.shape != (3,) or not np.all(np.isfinite(initial_state)):
+        raise ValueError("x0 must contain three finite state values [level, salinity, temperature].")
+    states[:, 0] = initial_state
     for sample in range(n_eval - 1):
         dt = time_vec[sample + 1] - time_vec[sample]
         l = states[:, sample][0]
@@ -89,12 +109,14 @@ def fuzzy_solver(time_vec, x0, u, d, params):
         dl_dt = level_block.level_derivative(I_w_in, w_v, w_b)
         l_next = level_update_block.level_update(dl_dt, l, dt)
         
-        E_s = salt_balance_block.salt_balance(I_s_in, w_b, x)
+        E_s = salt_balance_block.salt_balance(I_s_in, I_w_in, w_v, x)
         dx_dt = salt_block.salt_derivative(E_s, l_next)
         x_next = salt_update_block.salt_update(dx_dt, x, dt)
         
         E_h_in = I_q + I_h_in
-        E_h_out = outlet_enthalpy_block.outlet_energy(w_v, w_b, t_v)
+        E_h_out = outlet_enthalpy_block.outlet_energy(
+            w_v, w_f, w_bin, l_next, x_next, t_v, params
+        )
         E_h = enthalpy_balance_block.enthalpy_balance(E_h_in, E_h_out)
         
         dT_dt = temperature_block.temperature_derivative(E_h, l_next)

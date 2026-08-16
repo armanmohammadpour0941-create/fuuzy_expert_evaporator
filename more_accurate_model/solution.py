@@ -15,7 +15,6 @@ def calculate_vapor_flow_from_sol(sol, u, d, params):
     t_v_vec = sol.y[2]
     x_vec = sol.y[1]
     t_sin = params.t_sin
-    A_e = params.A_e
     bt = params.boiling_temp
     W_v_vec = []
 
@@ -46,14 +45,14 @@ def calculate_vapor_flow_from_sol(sol, u, d, params):
         t_v = t_v_vec[i]
         x = x_vec[i]
         t_b = t_v + th.bpe(t_v, x)
-        t_t = 0.5 * t_sin + 0.5 * t_v
-        lambda_s = th.calculate_steam_latent_heat(t_t)
+        # Keep the reported algebraic vapor flow consistent with
+        # equation.med_equation and the fuzzy model's algebraic vapor block.
+        lambda_s = th.calculate_steam_latent_heat(t_sin)
         lambda_v = th.calculate_steam_latent_heat(t_v)
         cp_f = th.calculate_heat_capacity(t_f, x_f)
         cp_bin = th.calculate_heat_capacity(t_bin, x_bin)
 
-        Q_e = th.heat_transfer_rate(t_sin, t_v, A_e)
-        Q_e = max(w_s * lambda_s, Q_e)
+        Q_e = w_s * lambda_s
         w_v_t = ((Q_e) + (w_f * cp_f * (t_f - bt))) / lambda_v
         w_v_f = w_bin * cp_bin * (t_bin - t_b ) / lambda_v
         w_v = w_v_t + w_v_f

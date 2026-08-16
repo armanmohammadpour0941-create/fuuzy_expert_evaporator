@@ -13,9 +13,10 @@ def temperature_derivative(e_h, l):
     return ra.calculate_fuzzy_block_output(
         e_h,
         l,
-        [0.0, -10000.0, 10000.0],
-        [0.12, 0.02, 0.22],
-        [0.0, -0.2, 0.2],
+        [0.0, -20000.0, 20000.0],
+        [0.12, 0.04, 0.22],
+        [0.0, -3.0, 3.0],
         INVERSE_INVENTORY_RULES,
         "centroid",
+        "sensitive",
     )

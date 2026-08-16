@@ -18,14 +18,27 @@ from more_accurate_model.solution import (
 )
 from more_accurate_model.solver import evaporator_ode_solver
 
+VARIABLES = (
+    ("Level", "m", 0.22),
+    ("Salinity", "wt%", 4.0),
+    ("Temperature", "deg C", 25.0),
+    ("Vapor flow", "kg/s", 15.0),
+    ("Brine flow", "kg/s", 25.0),
+)
+STEP_VARIABLES = ("w_s", "w_f", "w_bin", "t_f")
 
-def build_case(step_change: float, variable_name: str):
-    count = 1000
+
+def build_case(variable_name=None, step_change=0.0, count=1000):
     time = np.linspace(0.0, 1000.0, count)
-    steam = np.full(count, 20.0)
-    feed = np.full(count, 40.0)
-    feed_temperature = np.full(count, 20.0)
-    previous_brine = np.full(count, 30.0)
+    vectors = {
+        "w_s": np.full(count, 20.0),
+        "w_f": np.full(count, 40.0),
+        "w_bin": np.full(count, 30.0),
+        "t_f": np.full(count, 20.0),
+    }
+    if variable_name is not None:
+        vectors[variable_name][count // 2 :] *= 1.0 + step_change
+
     params = Params(
         t_sin=55.0,
         A_s=8.64,
@@ -35,28 +48,16 @@ def build_case(step_change: float, variable_name: str):
         boiling_temp=50.0,
         seawater_salinity=4.0,
         previous_brine_salinity=6.0,
-        previous_brine_temp= 60.0,
+        previous_brine_temp=60.0,
     )
-    for sample in range(count // 2, count):
-        if variable_name == "w_s":
-            steam[sample] = 20 * (1 + step_change)
-        elif variable_name == "w_f":
-            feed[sample] = 40 * (1 + step_change)
-        elif variable_name == "w_bin":
-            previous_brine[sample] = 30 * (1 + step_change)
-        elif variable_name == "t_f":
-            feed_temperature[sample] = 20 * (1 + step_change)
-        else:
-            print("variable name is not match")
-            break
-        
-    return time, [steam, feed, previous_brine], [feed_temperature], params
+    inputs = [vectors["w_s"], vectors["w_f"], vectors["w_bin"]]
+    disturbances = [vectors["t_f"]]
+    return time, inputs, disturbances, params
 
 
-def main():
-    time, inputs, disturbances, params = build_case(0.1, "w_f")
+def run_case(variable_name=None, step_change=0.0):
+    time, inputs, disturbances, params = build_case(variable_name, step_change)
     initial_state = [0.05, 5.5, 45.0]
-
     fuzzy = fuzzy_solver(time, initial_state, inputs, disturbances, params)
     reference = evaporator_ode_solver(
         (time[0], time[-1]),
@@ -67,56 +68,96 @@ def main():
         time,
         params,
     )
-    reference_vapor = np.asarray(
-        calculate_vapor_flow_from_sol(reference, inputs, disturbances, params)
+    fuzzy_series = (fuzzy.y[0], fuzzy.y[1], fuzzy.y[2], fuzzy.w_v, fuzzy.w_b)
+    reference_series = (
+        reference.y[0],
+        reference.y[1],
+        reference.y[2],
+        np.asarray(calculate_vapor_flow_from_sol(reference, inputs, disturbances, params)),
+        np.asarray(calculate_liquid_flow_from_sol(reference, params)),
     )
-    reference_brine = np.asarray(calculate_liquid_flow_from_sol(reference, params))
+    return time, fuzzy_series, reference_series
+
+
+def main():
+    scenarios = [("baseline", None, 0.0)]
+    scenarios.extend((f"{name}_plus_20pct", name, 0.20) for name in STEP_VARIABLES)
+    scenarios.extend((f"{name}_minus_20pct", name, -0.20) for name in STEP_VARIABLES)
 
     output_dir = ROOT_DIR / "validation"
     output_dir.mkdir(exist_ok=True)
-    figure_path = output_dir / "fuzzy_vs_dynamic.png"
-    metrics_path = output_dir / "final_value_comparison.csv"
+    metrics_path = output_dir / "step_response_metrics.csv"
+    compatibility_metrics_path = output_dir / "final_value_comparison.csv"
+    figure_path = output_dir / "step_response_comparison.png"
 
-    series = [
-        (fuzzy.y[0], reference.y[0], "Level", "m"),
-        (fuzzy.y[1], reference.y[1], "Salinity", "wt%"),
-        (fuzzy.y[2], reference.y[2], "Temperature", "°C"),
-        (fuzzy.w_v, reference_vapor, "Vapor flow", "kg/s"),
-        (fuzzy.w_b, reference_brine, "Brine flow", "kg/s"),
+    results = {}
+    rows = []
+    for scenario_name, variable_name, step_change in scenarios:
+        time, fuzzy_series, reference_series = run_case(variable_name, step_change)
+        results[scenario_name] = (time, fuzzy_series, reference_series)
+        evaluation_slice = slice(len(time) // 2, None) if variable_name else slice(None)
+        for (label, unit, scale), fuzzy_values, reference_values in zip(
+            VARIABLES, fuzzy_series, reference_series, strict=True
+        ):
+            errors = fuzzy_values[evaluation_slice] - reference_values[evaluation_slice]
+            rmse = float(np.sqrt(np.mean(errors**2)))
+            rows.append(
+                [
+                    scenario_name,
+                    label,
+                    unit,
+                    rmse,
+                    100.0 * rmse / scale,
+                    float(fuzzy_values[-1]),
+                    float(reference_values[-1]),
+                    float(abs(fuzzy_values[-1] - reference_values[-1])),
+                ]
+            )
+
+    header = [
+        "scenario",
+        "variable",
+        "unit",
+        "rmse",
+        "normalized_rmse_percent",
+        "fuzzy_final",
+        "ode_final",
+        "final_absolute_error",
     ]
-    figure, axes = plt.subplots(3, 2, figsize=(12, 10), sharex=True)
-    for axis, (fuzzy_values, reference_values, label, unit) in zip(
-        axes.flat, series, strict=False
-    ):
-        axis.plot(time, reference_values, label="ODE reference", linewidth=2.0)
-        axis.plot(time, fuzzy_values, label="Corrected fuzzy", linewidth=1.8)
-        axis.set_ylabel(f"{label} ({unit})")
-        axis.grid(alpha=0.25)
-    axes.flat[-1].axis("off")
+    for path in (metrics_path, compatibility_metrics_path):
+        with path.open("w", newline="", encoding="utf-8") as handle:
+            writer = csv.writer(handle)
+            writer.writerow(header)
+            writer.writerows(rows)
+
+    figure, axes = plt.subplots(3, 4, figsize=(16, 10), sharex=True)
+    for column, step_variable in enumerate(STEP_VARIABLES):
+        time, fuzzy_series, reference_series = results[f"{step_variable}_plus_20pct"]
+        for row, (label, unit, _scale) in enumerate(VARIABLES[:3]):
+            axes[row, column].plot(time, reference_series[row], label="ODE reference", lw=2.0)
+            axes[row, column].plot(time, fuzzy_series[row], "--", label="Fuzzy", lw=1.6)
+            axes[row, column].axvline(time[len(time) // 2], color="0.6", lw=0.8)
+            axes[row, column].grid(alpha=0.25)
+            axes[row, column].set_ylabel(f"{label} ({unit})")
+        axes[0, column].set_title(f"+20% step in {step_variable}")
+        axes[-1, column].set_xlabel("Time (s)")
     axes[0, 0].legend()
-    axes[2, 0].set_xlabel("Time (s)")
-    axes[1, 1].set_xlabel("Time (s)")
-    figure.suptitle("Corrected fuzzy MED model vs dynamic reference")
+    figure.suptitle("Fuzzy MED model versus ODE reference: positive step tests")
     figure.tight_layout()
     figure.savefig(figure_path, dpi=180, bbox_inches="tight")
     plt.close(figure)
 
-    with metrics_path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.writer(handle)
-        writer.writerow(
-            ["variable", "fuzzy_final", "ode_final", "absolute_error", "relative_error_percent"]
-        )
-        for fuzzy_values, reference_values, label, _ in series:
-            fuzzy_final = float(fuzzy_values[-1])
-            reference_final = float(reference_values[-1])
-            absolute_error = abs(fuzzy_final - reference_final)
-            relative_error = 100.0 * absolute_error / abs(reference_final)
-            writer.writerow(
-                [label, fuzzy_final, reference_final, absolute_error, relative_error]
-            )
-
+    state_labels = {"Level", "Salinity", "Temperature"}
+    step_state_rows = [
+        row for row in rows if row[0] != "baseline" and row[1] in state_labels
+    ]
+    worst = max(step_state_rows, key=lambda row: row[4])
     print(f"Saved {figure_path}")
     print(f"Saved {metrics_path}")
+    print(
+        "Worst step-response state NRMSE: "
+        f"{worst[4]:.3f}% ({worst[0]}, {worst[1]})"
+    )
 
 
 if __name__ == "__main__":

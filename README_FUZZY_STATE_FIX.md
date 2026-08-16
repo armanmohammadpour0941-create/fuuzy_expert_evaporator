@@ -1,43 +1,71 @@
-# Fuzzy-state solver correction
+# Fuzzy MED solver: step-response correction
 
-## Root cause
+## Root causes
 
-The algebraic vapor and brine-flow equations were not the source of the bad
-state trajectories. The recurrent state update was.
+The operating-point match hid three transient-model errors:
 
-The previous implementation defuzzified an absolute next state from
-`(state derivative, previous state)` at every sample. With only five output
-sets, this quantized the recurrent state. `som` made the problem larger by
-selecting the left edge of a maximum. For example, a zero derivative at the
-physical steady point did not preserve `(L, x, T) = (0.12, 5.74, 57.28)`.
+1. The level block normalized inlet flow over `60-80 kg/s` but outlet flow over
+   `68-72 kg/s`. The same physical flow change therefore received very
+   different linguistic weight.
+2. The salinity path used `I_s,in - w_b*x` and then treated the result directly
+   as a concentration derivative. That is a total salt-inventory balance; it
+   omits the concentration effect of changing liquid inventory.
+3. The old outlet-enthalpy fuzzy block used only vapor flow, brine flow and
+   temperature. It could not represent all terms in the ODE temperature
+   balance, and its narrow ranges clipped step inputs. Steam-flow steps could
+   consequently produce the wrong temperature-derivative sign.
 
-There were also two rule-design problems:
+The original five-set membership family also left a normalized dead band around
+zero. Balance errors could stop inside that dead band rather than converge to
+the physical equilibrium.
 
-- the level and balance tables were not consistent inlet-minus-outlet tables;
-- the salinity and temperature derivative tables allowed level to reverse the
-  derivative sign, although inventory should change only its magnitude.
+## Implemented changes
 
-Finally, the old derivative ranges (`±5 m/s`, `±100 wt%/s`, `±100 °C/s`) were
-too wide for this process and removed useful resolution around the operating
-point.
+- Level now fuzzifies the physical flow residual
+  `w_f + w_bin - w_v - w_b` over `[-15, 15] kg/s` and maps it to
+  `[-0.00170, 0.00170] m/s`.
+- The salt residual is now
+  `I_s,in - x*(w_f + w_bin - w_v)`, which is the numerator that drives
+  concentration change.
+- The temperature path uses an algebraic energy-demand index containing the
+  mixture-enthalpy and inventory terms required by the temperature balance.
+  The energy residual is still fuzzified before the temperature-derivative
+  block.
+- One-input balance blocks use a linear five-set partition and height
+  defuzzification. This keeps fuzzification/linguistic rules while removing the
+  artificial gain hump and zero dead band of clipped-area centroid inference.
+- Salinity and temperature derivative blocks use an overlapping sensitive
+  five-set profile near zero; general blocks retain the smoother original
+  membership profile.
+- The ODE-reference vapor-output function now uses the same steam latent-heat
+  definition as `equation.py` and the fuzzy algebraic vapor block.
+- Solver input shapes and finite values are validated explicitly.
+- Validation now covers baseline plus positive and negative 20% steps in
+  `w_s`, `w_f`, `w_bin`, and `t_f`.
 
-## Changes
+## Validation result
 
-- fuzzy blocks still infer `dL/dt`, `dx/dt`, and `dT/dt`;
-- state update blocks now integrate those fuzzy derivatives with the actual
-  sample interval: `state[k+1] = state[k] + dt * derivative[k]`;
-- continuous fuzzy blocks use centroid defuzzification;
-- physical ranges are centered on the verified operating point and use
-  piecewise scaling when the operating point is not the midpoint;
-- inputs are clipped to the normalized universe so out-of-range disturbances
-  activate shoulder sets instead of producing an empty aggregate;
-- all returned time, state, vapor-flow, and brine-flow arrays now have equal
-  length;
-- state bounds prevent invalid thermodynamic calls during large transients.
+For the included 1000-second cases, the worst post-step normalized trajectory
+errors are:
 
-## Baseline validation
+| Variable | Worst NRMSE | Scenario |
+| --- | ---: | --- |
+| Level | 0.958% | -20% feed flow |
+| Salinity | 0.121% | +20% steam flow |
+| Temperature | 0.434% | -20% steam flow |
+| Vapor flow | 0.119% | +20% steam flow |
+| Brine flow | 0.757% | -20% feed flow |
 
-Run from the repository root:
+Final-state errors in the tested cases are below `0.00033 m` for level,
+`0.00019 wt%` for salinity, and `0.012 deg C` for temperature.
+
+The tested range is the local operating envelope represented by the supplied
+rules and ranges. Larger steps should be added to the validation matrix before
+the fuzzy model is used outside this envelope.
+
+## Run
+
+From the repository root:
 
 ```bash
 python -m pip install -r requirements.txt
@@ -46,16 +74,5 @@ python more_accurate_model/fuzzy_model/validate_fuzzy_model.py
 pytest -q
 ```
 
-For the included 500-second baseline case, the corrected fuzzy model gives
-approximately:
-
-| Variable | Fuzzy model | ODE reference |
-| --- | ---: | ---: |
-| Level (m) | 0.1187 | 0.1197 |
-| Salinity (wt%) | 5.7847 | 5.7385 |
-| Temperature (°C) | 57.7057 | 57.2829 |
-| Vapor flow (kg/s) | 10.6155 | 10.7509 |
-| Brine flow (kg/s) | 58.9845 | 59.2223 |
-
-The validation script also tests positive and negative step changes and writes
-the comparison figure and final-value metrics under `validation/`.
+Validation outputs are written to `validation/step_response_comparison.png` and
+`validation/step_response_metrics.csv`.

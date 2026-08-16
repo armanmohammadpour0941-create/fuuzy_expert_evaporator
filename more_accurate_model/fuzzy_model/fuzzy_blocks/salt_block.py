@@ -13,9 +13,10 @@ def salt_derivative(e_s, l):
     return ra.calculate_fuzzy_block_output(
         e_s,
         l,
-        [0.0, -50.0, 50.0],
-        [0.12, 0.02, 0.22],
-        [0.0, -0.003, 0.003],
+        [0.0, -60.0, 60.0],
+        [0.12, 0.04, 0.22],
+        [0.0, -0.030, 0.030],
         INVERSE_INVENTORY_RULES,
         "centroid",
+        "sensitive",
     )
