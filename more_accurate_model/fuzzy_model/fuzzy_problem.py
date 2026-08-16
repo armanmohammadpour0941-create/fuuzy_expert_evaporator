@@ -21,10 +21,11 @@ def main(show_plots=True):
     w_s = [20.0] * n_eval
     w_f = [40.0] * n_eval
     t_f = [20.0] * n_eval
-    x_f = [4.0] * n_eval
     w_bin = [30.0] * n_eval
-    x_bin = [6.0] * n_eval
-    t_bin = [60.0] * n_eval
+    
+    x_f = 4.0
+    x_bin = 6.0
+    t_bin = 60.0
 
     params = Params(
         t_sin=55.0,
@@ -49,8 +50,8 @@ def main(show_plots=True):
     result = fuzzy_solver.fuzzy_solver(
         t_eval,
         x0,
-        [w_s, w_f],
-        [t_f, w_bin],
+        [w_s, w_f, w_bin],
+        [t_f],
         params,
     )
 

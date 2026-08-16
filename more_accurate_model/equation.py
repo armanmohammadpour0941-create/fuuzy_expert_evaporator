@@ -5,21 +5,18 @@ from more_accurate_model import thermo as th
 
 def med_equation(t, x, u, distur, params, time_vec):
     l_b, x, t_v = x
-    w_s_vec, w_f_vec = u
-    t_f_vec, w_bin_vec = distur
+    w_s_vec, w_f_vec, w_bin_vec = u
+    t_f_vec = distur[0]
 
-    x_f_vec = params.seawater_salinity
-    x_bin_vec = params.previous_brine_salinity
-    t_bin_vec = params.previous_brine_temp
+    x_f = params.seawater_salinity
+    x_bin = params.previous_brine_salinity
+    t_bin = params.previous_brine_temp
 
     w_s = np.interp(t, time_vec, w_s_vec)
     w_f = np.interp(t, time_vec, w_f_vec)
-    t_f = np.interp(t, time_vec, t_f_vec)
-    x_f = np.interp(t, time_vec, x_f_vec)
     w_bin = np.interp(t, time_vec, w_bin_vec)
-    x_bin = np.interp(t, time_vec, x_bin_vec)
-    t_bin = np.interp(t, time_vec, t_bin_vec)
-
+    t_f = np.interp(t, time_vec, t_f_vec)
+    
     G = 9.81  # gravity
     t_sin = params.t_sin  # incoming steam temperature (°C)
     A_s = params.A_s  # cross-sectional area of the evaporator (m2)
@@ -34,7 +31,7 @@ def med_equation(t, x, u, distur, params, time_vec):
     # g = -1.221e-5  # constant for enthalphy calculation
 
     boiling_temp = params.boiling_temp  # at 15 kpa
-    t_t = 0.5 * t_sin + 0.5 * t_v
+    
     t_b = t_v + th.bpe(t_v, x)
 
     rho_b = th.calculate_liquid_density(t_b, x)  # density of brine pool (kg/m3)
@@ -45,7 +42,7 @@ def med_equation(t, x, u, distur, params, time_vec):
     m = m_b + m_v  # total mass in the evaporator (kg)
     alpha = m_v / m  # mass fraction of vapor in the evaporator
 
-    lambda_s = th.calculate_steam_latent_heat(t_t)
+    lambda_s = th.calculate_steam_latent_heat(t_sin)
     lambda_v = th.calculate_steam_latent_heat(t_v)
     cp_f = th.calculate_heat_capacity(t_f, x_f)
     cp_bin = th.calculate_heat_capacity(t_bin, x_bin)

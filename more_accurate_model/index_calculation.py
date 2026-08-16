@@ -3,9 +3,9 @@ from more_accurate_model import thermo as th
 
 
 def calculate_all_indices(sol, u, d, params):
-    i_w_in = calculate_inlet_flow_index(u, d)
-    i_s_in = calculate_salt_inlet_index(u, d, params)
-    E_s = calculate_salt_balance_index(sol, u, d, params)
+    i_w_in = calculate_inlet_flow_index(u)
+    i_s_in = calculate_salt_inlet_index(u, params)
+    E_s = calculate_salt_balance_index(sol, u, params)
     E_w_v = calculate_vapor_energy(sol, u, d, params)
     E_w_b = calculate_liquid_energy(sol, params)
     E_h_out = calculate_outlet_enthalpy_index(sol, u, d, params)
@@ -36,27 +36,26 @@ def calculate_all_indices(sol, u, d, params):
 
 # I_Q
 def calculate_heat_index(u):
-    w_s_vec, _ = u
+    w_s_vec, _, _= u
     t_sin = [55] * len(w_s_vec)
     lambda_s_vec = th.calculate_steam_latent_heat_as_vec(t_sin)
     I_q = [w_s * lambda_s for w_s, lambda_s in zip(w_s_vec, lambda_s_vec)]
     return I_q
 
 # I_w_in
-def calculate_inlet_flow_index(u, d):
-    _, w_f_vec = u
-    _, w_bin_vec = d 
+def calculate_inlet_flow_index(u):
+    _, w_f_vec, w_bin_vec = u
     I_w_in = [w_f + w_bin for w_f, w_bin in zip(w_f_vec, w_bin_vec)]
     return I_w_in
 
 # I_s_in
-def calculate_salt_inlet_index(u, d, params):
-    _, w_f_vec = u
-    _, w_bin_vec= d 
-    x_f_vec = params.seawater_salinity
-    x_bin_vec = params.previous_brine_salinity
-    w_f_x_f = [w_f * x_f for w_f, x_f in zip(w_f_vec, x_f_vec)]
-    w_b_x_b = [w_b * x_b for w_b, x_b in zip(w_bin_vec, x_bin_vec)]
+def calculate_salt_inlet_index(u, params):
+    _, w_f_vec, w_bin_vec = u
+    
+    x_f = params.seawater_salinity
+    x_bin = params.previous_brine_salinity
+    w_f_x_f = [w_f * x_f for w_f in w_f_vec]
+    w_b_x_b = [w_b * x_bin for w_b in w_bin_vec]
     I_s_in = [feed + brine for feed, brine in zip(w_f_x_f, w_b_x_b)]
     return I_s_in
 
@@ -68,22 +67,22 @@ def calculate_salt_outlet_index(sol, params):
     return I_s_out
 
 # E_s = I_s_in - I_s_out
-def calculate_salt_balance_index(sol, u, d, params):
-    i_s_in_vec = calculate_salt_inlet_index(u, d, params)
+def calculate_salt_balance_index(sol, u, params):
+    i_s_in_vec = calculate_salt_inlet_index(u, params)
     i_s_out_vec = calculate_salt_outlet_index(sol, params)
     E_s = [i_s_in - i_s_out for i_s_in, i_s_out in zip(i_s_in_vec, i_s_out_vec)]
     return E_s
 
 # I_h_in
 def calculate_inlet_flow_enthalpy_index(u, d, params):
-    _, w_f_vec = u
-    t_f_vec, w_bin_vec, = d
-    t_bin_vec = params.previous_brine_temp
+    _, w_f_vec, w_bin_vec = u
+    t_f_vec = d[0]
+    t_bin = params.previous_brine_temp
     h_f_vec = th.calculate_liquid_water_enthalpy_as_vec(t_f_vec)
-    h_b_vec = th.calculate_liquid_water_enthalpy_as_vec(t_bin_vec)
+    h_b = th.calculate_liquid_water_enthalpy(t_bin)
     
     w_f_h_f = [w_f * h_f for w_f, h_f in zip(w_f_vec, h_f_vec)]
-    w_b_h_b = [w_b * h_b for w_b, h_b in zip(w_bin_vec, h_b_vec)]
+    w_b_h_b = [w_b * h_b for w_b in w_bin_vec]
     I_h_in = [feed + brine for feed, brine in zip(w_f_h_f, w_b_h_b)]
     return I_h_in
 

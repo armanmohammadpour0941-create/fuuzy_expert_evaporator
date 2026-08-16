@@ -1,3 +1,11 @@
+import sys
+from pathlib import Path
+
+FILE_PATH = Path(__file__).resolve()
+ROOT_DIR = next(p for p in FILE_PATH.parents if p.name == "fuuzy_expert_evaporator")
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+    
 from dataclasses import dataclass
 
 import numpy as np
@@ -15,25 +23,26 @@ class Params:
     A_e: float  # heat transfer area(m2)
     H: float  # hight of effect(m)
     boiling_temp: float  # boiling temperature at the effect pressure (deg C)
-    seawater_salinity: list[float]
-    previous_brine_salinity: list[float]
-    previous_brine_temp: list[float]
+    seawater_salinity: float
+    previous_brine_salinity: float
+    previous_brine_temp: float
 
 
 def main():
-    t_span = (0, 5000)
-    t_eval = np.linspace(0, 5000, 5000)
+    t_span = (0, 1000)
+    t_eval = np.linspace(0, 1000, 1000)
     n_eval = len(t_eval)
 
     x0 = [0.01, 0.5, 30.0]
     w_s = [20] * n_eval
     w_f = [40] * n_eval
-
-    t_f = [20] * n_eval
-    x_f = [4] * n_eval
     w_bin = [30] * n_eval
-    x_bin = [6] * n_eval
-    t_bin = [60] * n_eval
+    
+    t_f = [20] * n_eval
+    
+    x_f = 4
+    x_bin = 6
+    t_bin = 60
 
     params = Params(
         t_sin=55.0,
@@ -64,13 +73,11 @@ def main():
         # disturbance negative change
         # t_f[i] = 20 * (1 - change_precentage)
         # w_bin[i] = 50 * (1 - change_precentage)
+        _ = change_precentage
 
 
-    u = [w_s, w_f]
-    d = [
-        t_f,  # T_f - feed temperature (°C)
-        w_bin,  # W_bin - brine inlet flow (kg/s)
-    ]
+    u = [w_s, w_f, w_bin]
+    d = [t_f]   # T_f - feed temperature (°C)
 
     sol = solver.evaporator_ode_solver(t_span, t_eval, x0, u, d, t_eval, params)
     w_v = sl.calculate_vapor_flow_from_sol(sol, u, d, params)
@@ -82,7 +89,7 @@ def main():
     # calculation Indices
     (indices, _, _) = ic.calculate_all_indices(sol, u, d, params)
     sl.print_final_value(sol, w_v, w_b, indices)
-    # sl.plot_complete_solution(sol, w_v, w_b)
+    sl.plot_complete_solution(sol, w_v, w_b)
     # sl.plot_indices(sol, indices, label, unit)
 if __name__ == "__main__":
     main()

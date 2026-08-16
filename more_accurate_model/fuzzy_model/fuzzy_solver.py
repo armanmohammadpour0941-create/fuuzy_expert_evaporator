@@ -51,12 +51,12 @@ def fuzzy_solver(time_vec, x0, u, d, params):
     n_eval = len(time_vec)
     states = np.empty((3, n_eval), dtype=float)
     
-    w_s_vec, w_f_vec = u
-    t_f_vec, w_bin_vec = d
+    w_s_vec, w_f_vec, w_bin_vec = u
+    t_f_vec = d[0]
 
-    x_f_vec = params.seawater_salinity
-    x_bin_vec = params.previous_brine_salinity
-    t_bin_vec = params.previous_brine_temp
+    x_f = params.seawater_salinity
+    x_bin = params.previous_brine_salinity
+    t_bin = params.previous_brine_temp
     t_sin = params.t_sin
     t_boil = params.boiling_temp
     A_o = params.A_o
@@ -76,10 +76,6 @@ def fuzzy_solver(time_vec, x0, u, d, params):
 
         t_f = t_f_vec[sample]
         w_bin = w_bin_vec[sample]
-
-        x_f = x_f_vec[sample]
-        x_bin = x_bin_vec[sample]
-        t_bin = t_bin_vec[sample]
 
         w_v = vapor_flow.calculate_vapor_flow_rate(
             x, x_f, x_bin, t_v, t_f, t_bin, t_sin, t_boil, w_s, w_f, w_bin
@@ -130,11 +126,11 @@ def fuzzy_solver(time_vec, x0, u, d, params):
     w_v_out.append(
         vapor_flow.calculate_vapor_flow_rate(
             x,
-            x_f_vec[-1],
-            x_bin_vec[-1],
+            x_f,
+            x_bin,
             t_v,
             t_f_vec[-1],
-            t_bin_vec[-1],
+            t_bin,
             t_sin,
             t_boil,
             w_s_vec[-1],
