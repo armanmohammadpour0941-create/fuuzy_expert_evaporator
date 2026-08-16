@@ -1,5 +1,3 @@
-"""Runnable example for the fuzzy evaporator model."""
-
 import sys
 from pathlib import Path
 
@@ -40,7 +38,6 @@ def main(show_plots=True):
         previous_brine_temp=t_bin,
     )
 
-    # Uncomment an assignment to create a 20% step at t = 250 s.
     for sample in range(n_eval // 2, n_eval):
         change_percentage = 0.10
         # w_s[sample] = 20.0 * (1.0 + change_percentage)

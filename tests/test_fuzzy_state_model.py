@@ -1,3 +1,11 @@
+import sys
+from pathlib import Path
+
+FILE_PATH = Path(__file__).resolve()
+ROOT_DIR = next(p for p in FILE_PATH.parents if p.name == "fuuzy_expert_evaporator")
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+    
 import numpy as np
 import pytest
 
@@ -10,8 +18,8 @@ from more_accurate_model.problem import Params
 
 
 def make_case(step=None):
-    count = 500
-    time = np.linspace(0.0, 500.0, count)
+    count = 1000
+    time = np.linspace(0.0, 1000.0, count)
     steam = np.full(count, 20.0)
     feed = np.full(count, 40.0)
     feed_temperature = np.full(count, 20.0)

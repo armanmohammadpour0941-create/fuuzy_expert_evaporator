@@ -8,9 +8,8 @@ DIFFERENCE_RULES = [
     ["PL", "PL", "PL", "PS", "Z"],
 ]
 
-
+# dl/dt
 def level_derivative(i_w_in, w_v, w_b):
-    """Infer dL/dt from inlet minus total outlet flow."""
 
     return ra.calculate_fuzzy_block_output(
         i_w_in,

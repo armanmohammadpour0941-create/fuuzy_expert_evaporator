@@ -8,10 +8,8 @@ INVERSE_INVENTORY_RULES = [
     ["PL", "PL", "PL", "PS", "PS"],
 ]
 
-
+# dx/dt
 def salt_derivative(e_s, l):
-    """Infer dx/dt; level changes magnitude but never reverses its sign."""
-
     return ra.calculate_fuzzy_block_output(
         e_s,
         l,

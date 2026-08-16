@@ -15,8 +15,6 @@ def calculate_fuzzy_block_output(
     rule_table,
     mod="centroid",
 ):
-    """Evaluate a two-input Mamdani block and return a physical crisp value."""
-
     if len(rule_table) != 5 or any(len(row) != 5 for row in rule_table):
         raise ValueError("rule_table must be a 5 x 5 table.")
     unknown = {label for row in rule_table for label in row} - set(LABELS)

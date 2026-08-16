@@ -8,7 +8,7 @@ DIFFERENCE_RULES = [
     ["PL", "PL", "PL", "PS", "Z"],
 ]
 
-
+# E_h
 def enthalpy_balance(e_h_in, e_h_out):
     return ra.calculate_fuzzy_block_output(
         e_h_in,

@@ -8,10 +8,8 @@ DIFFERENCE_RULES = [
     ["PL", "PL", "PL", "PS", "Z"],
 ]
 
-
+# E_s
 def salt_balance(i_s_in, w_b, x):
-    """Infer the salt accumulation signal from inlet minus outlet salt."""
-
     return ra.calculate_fuzzy_block_output(
         i_s_in,
         w_b * x,

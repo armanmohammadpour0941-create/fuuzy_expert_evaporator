@@ -1,11 +1,3 @@
-"""Scaling helpers for the normalized fuzzy universe ``[-5, 5]``.
-
-The first item in every range is the operating point, not necessarily the
-midpoint of the lower and upper bounds.  Scaling each side independently keeps
-the operating point exactly at zero and maps both physical bounds exactly to
-the fuzzy-universe bounds.
-"""
-
 import numpy as np
 
 

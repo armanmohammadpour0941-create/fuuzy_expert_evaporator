@@ -11,7 +11,7 @@ ADDITION_RULES = [
 VAPOR_ENERGY_RANGE = [29184.44, 27000.0, 31370.0]
 LIQUID_ENERGY_RANGE = [30440.22, 25800.0, 35000.0]
 
-
+# E_h_out
 def outlet_energy(w_v, w_b, temperature):
     vapor_energy = ra.calculate_fuzzy_block_output(
         w_v,

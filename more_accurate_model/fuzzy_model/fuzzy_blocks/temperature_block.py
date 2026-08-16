@@ -8,10 +8,8 @@ INVERSE_INVENTORY_RULES = [
     ["PL", "PL", "PL", "PS", "PS"],
 ]
 
-
+#dT/dt
 def temperature_derivative(e_h, l):
-    """Infer dT/dt; liquid level changes thermal-inertia magnitude."""
-
     return ra.calculate_fuzzy_block_output(
         e_h,
         l,

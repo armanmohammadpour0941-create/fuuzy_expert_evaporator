@@ -1,5 +1,3 @@
-"""Compare the corrected fuzzy model with the physical ODE baseline."""
-
 import csv
 import sys
 from pathlib import Path
@@ -22,8 +20,8 @@ from more_accurate_model.solver import evaporator_ode_solver
 
 
 def build_case():
-    count = 500
-    time = np.linspace(0.0, 500.0, count)
+    count = 1000
+    time = np.linspace(0.0, 1000.0, count)
     steam = np.full(count, 20.0)
     feed = np.full(count, 40.0)
     feed_temperature = np.full(count, 20.0)
