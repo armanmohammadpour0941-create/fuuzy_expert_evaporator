@@ -81,8 +81,8 @@ def run_case(variable_name=None, step_change=0.0):
 
 def main():
     scenarios = [("baseline", None, 0.0)]
-    scenarios.extend((f"{name}_plus_20pct", name, 0.20) for name in STEP_VARIABLES)
-    scenarios.extend((f"{name}_minus_20pct", name, -0.20) for name in STEP_VARIABLES)
+    scenarios.extend((f"{name}_plus_10pct", name, 0.10) for name in STEP_VARIABLES)
+    scenarios.extend((f"{name}_minus_10pct", name, -0.10) for name in STEP_VARIABLES)
 
     output_dir = ROOT_DIR / "validation"
     output_dir.mkdir(exist_ok=True)
@@ -132,14 +132,14 @@ def main():
 
     figure, axes = plt.subplots(3, 4, figsize=(16, 10), sharex=True)
     for column, step_variable in enumerate(STEP_VARIABLES):
-        time, fuzzy_series, reference_series = results[f"{step_variable}_plus_20pct"]
+        time, fuzzy_series, reference_series = results[f"{step_variable}_plus_10pct"]
         for row, (label, unit, _scale) in enumerate(VARIABLES[:3]):
             axes[row, column].plot(time, reference_series[row], label="ODE reference", lw=2.0)
             axes[row, column].plot(time, fuzzy_series[row], "--", label="Fuzzy", lw=1.6)
             axes[row, column].axvline(time[len(time) // 2], color="0.6", lw=0.8)
             axes[row, column].grid(alpha=0.25)
             axes[row, column].set_ylabel(f"{label} ({unit})")
-        axes[0, column].set_title(f"+20% step in {step_variable}")
+        axes[0, column].set_title(f"+10% step in {step_variable}")
         axes[-1, column].set_xlabel("Time (s)")
     axes[0, 0].legend()
     figure.suptitle("Fuzzy MED model versus ODE reference: positive step tests")
